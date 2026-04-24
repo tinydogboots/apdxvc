@@ -1,0 +1,11 @@
+{
+  "embeddings": [
+    {
+      "tensorName": "My Embeddings",
+      "tensorShape": [100, 64],
+      "tensorPath": "data/embeddings.bytes",
+      "metadataPath": "data/metadata.tsv"
+    }
+  ],
+  "modelCheckpointPath": "Custom embeddings"
+}
