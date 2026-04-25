@@ -233,6 +233,37 @@
   .node.dimmed circle { opacity: 0.08; }
   .link.dimmed { opacity: 0.03; }
 
+  /* ─── Isolation mode ─────────────────────────────────────────────── */
+  #isolation-bar {
+    display: none;
+    position: absolute;
+    top: 10px; left: 50%; transform: translateX(-50%);
+    background: var(--accent);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 20px;
+    z-index: 10;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px #0006;
+  }
+
+  #isolation-bar.visible { display: flex; }
+
+  #isolation-bar button {
+    background: #ffffff30;
+    border: none;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
   /* ─── Filter drawer (mobile) ─────────────────────────────────────── */
   #filter-drawer {
     position: fixed; inset: 0; z-index: 40;
@@ -373,11 +404,18 @@
     </div>
   </div>
 
+  <!-- isolation bar -->
+  <div id="isolation-bar">
+    <span id="isolation-label">Isolated view</span>
+    <button id="exit-isolation">✕ Exit</button>
+  </div>
+
   <!-- detail panel -->
   <div id="panel">
     <div class="panel-header">
       <div class="panel-dot" id="panel-dot"></div>
       <div class="panel-comment" id="panel-comment"></div>
+      <button class="panel-isolate" id="panel-isolate" title="Isolate this node and its connections" style="display:none;margin-left:4px;background:none;border:1px solid var(--accent);color:var(--accent);font-size:11px;font-weight:600;padding:3px 9px;border-radius:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Isolate</button>
       <button class="panel-close" id="panel-close">×</button>
     </div>
     <div class="panel-body" id="panel-body"></div>
@@ -431,12 +469,13 @@ const TIER_LAYOUT = {
   foundational: { yFrac: 0.80, xSpan: 0.90 },
 };
 
-let currentView = "force";
-let activeTiers = new Set(["foundational", "intermediate", "advanced"]);
-let activeConns = new Set(["dependency", "shared_root", "enabler", "tension", "cross_tier_bridge"]);
-let selectedId  = null;
-let searchQuery = "";
-let simulation  = null;
+let currentView   = "force";
+let activeTiers   = new Set(["foundational", "intermediate", "advanced"]);
+let activeConns   = new Set(["dependency", "shared_root", "enabler", "tension", "cross_tier_bridge"]);
+let selectedId    = null;
+let isolatedId    = null;   // node currently being isolated
+let searchQuery   = "";
+let simulation    = null;
 let nodeSel, linkSel, pyramidBg;
 let W, H;
 
@@ -659,6 +698,16 @@ function selectNode(d, nodes, links) {
     return s !== d.id && t !== d.id;
   });
 
+  // Show isolate button only if node has connections
+  const hasConns = links.some(l => {
+    const s = typeof l.source === "object" ? l.source.id : l.source;
+    const t = typeof l.target === "object" ? l.target.id : l.target;
+    return s === d.id || t === d.id;
+  });
+  const isolateBtn = document.getElementById("panel-isolate");
+  isolateBtn.style.display = hasConns ? "block" : "none";
+  isolateBtn.onclick = () => enterIsolation(d);
+
   document.getElementById("panel-dot").style.background = TIER_COLOR[d.tier] || "#888";
   document.getElementById("panel-comment").textContent  = d.label;
   document.getElementById("panel-body").innerHTML = `
@@ -708,7 +757,52 @@ function buildConnList(d, links) {
   }).join("");
 }
 
+function enterIsolation(d) {
+  isolatedId = d.id;
+
+  // Collect this node + all directly connected nodes
+  const keep = new Set([d.id]);
+  window._links.forEach(l => {
+    const s = typeof l.source === "object" ? l.source.id : l.source;
+    const t = typeof l.target === "object" ? l.target.id : l.target;
+    if (s === d.id) keep.add(t);
+    if (t === d.id) keep.add(s);
+  });
+
+  // Hide everything outside the subgraph
+  nodeSel.style("display", n => keep.has(n.id) ? null : "none");
+  linkSel.style("display", l => {
+    const s = typeof l.source === "object" ? l.source.id : l.source;
+    const t = typeof l.target === "object" ? l.target.id : l.target;
+    return keep.has(s) && keep.has(t) ? null : "none";
+  });
+
+  // Un-dim everything that's visible
+  nodeSel.classed("dimmed", false);
+  linkSel.classed("dimmed", false);
+
+  // Re-centre the isolated subgraph
+  window._nodes.forEach(n => { n.fx = null; n.fy = null; });
+  simulation?.force("center", d3.forceCenter(W / 2, H / 2)).alpha(0.6).restart();
+
+  // Show isolation bar
+  const bar = document.getElementById("isolation-bar");
+  document.getElementById("isolation-label").textContent = `${keep.size} nodes isolated`;
+  bar.classList.add("visible");
+
+  // Close panel
+  document.getElementById("panel").classList.remove("open");
+}
+
+function exitIsolation() {
+  isolatedId = null;
+  document.getElementById("isolation-bar").classList.remove("visible");
+  applyFilters();           // restore normal visibility
+  simulation?.alpha(0.4).restart();
+}
+
 function deselect() {
+  if (isolatedId) return;   // don't deselect while isolated — use Exit button
   selectedId = null;
   nodeSel?.classed("dimmed", false);
   linkSel?.classed("dimmed", false);
@@ -774,6 +868,7 @@ bindSearch("search-desktop");
 bindSearch("search-mobile");
 
 document.getElementById("panel-close").addEventListener("click", deselect);
+document.getElementById("exit-isolation").addEventListener("click", exitIsolation);
 document.getElementById("canvas-wrap").querySelector("svg")?.addEventListener("click", deselect);
 
 // ── Filter drawer ──────────────────────────────────────────────────────────────
