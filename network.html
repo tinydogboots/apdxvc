@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signage & Wayfinding — Relationship Map</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  /* ── Design tokens — change these to restyle everything ── */
+  :root {
+    --bg:           #0f1117;
+    --surface:      #1a1d27;
+    --border:       #2a2d3a;
+    --text:         #e8eaf0;
+    --text-muted:   #6b7080;
+    --accent:       #7c6af7;
+
+    --tier-foundational: #e05555;
+    --tier-intermediate: #e8922a;
+    --tier-advanced:     #3db87a;
+
+    --conn-dependency:        #e05555;
+    --conn-shared_root:       #9b6fe0;
+    --conn-enabler:           #3db87a;
+    --conn-tension:           #e8922a;
+    --conn-cross_tier_bridge: #4a9eda;
+
+    --panel-width: 320px;
+    --header-h:    52px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  header {
+    height: var(--header-h);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 16px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  header h1 {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    white-space: nowrap;
+  }
+
+  .search {
+    flex: 1;
+    max-width: 260px;
+    position: relative;
+  }
+
+  .search input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 6px 10px;
+    outline: none;
+  }
+
+  .search input:focus { border-color: var(--accent); }
+
+  .filters {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .chip.active { color: var(--text); border-color: currentColor; }
+  .chip[data-tier="foundational"].active  { color: var(--tier-foundational); }
+  .chip[data-tier="intermediate"].active  { color: var(--tier-intermediate); }
+  .chip[data-tier="advanced"].active      { color: var(--tier-advanced); }
+  .chip[data-conn="dependency"].active        { color: var(--conn-dependency); }
+  .chip[data-conn="shared_root"].active       { color: var(--conn-shared_root); }
+  .chip[data-conn="enabler"].active           { color: var(--conn-enabler); }
+  .chip[data-conn="tension"].active           { color: var(--conn-tension); }
+  .chip[data-conn="cross_tier_bridge"].active { color: var(--conn-cross_tier_bridge); }
+
+  /* ── Main layout ── */
+  .main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ── Canvas ── */
+  #canvas {
+    flex: 1;
+    cursor: grab;
+  }
+
+  #canvas:active { cursor: grabbing; }
+
+  /* ── Detail panel ── */
+  #panel {
+    width: var(--panel-width);
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+    flex-shrink: 0;
+    transform: translateX(var(--panel-width));
+    transition: transform .25s ease;
+  }
+
+  #panel.open { transform: translateX(0); }
+
+  .panel-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .panel-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  .panel-comment {
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .panel-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 0 0 0 8px;
+    flex-shrink: 0;
+  }
+
+  .panel-body { padding: 16px; }
+
+  .meta-row {
+    margin-bottom: 14px;
+  }
+
+  .meta-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .meta-value {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid;
+    margin: 2px 2px 0 0;
+  }
+
+  .connections-section { margin-top: 16px; }
+
+  .conn-item {
+    padding: 10px;
+    border-radius: 6px;
+    background: var(--bg);
+    margin-bottom: 8px;
+    border-left: 3px solid;
+    cursor: pointer;
+  }
+
+  .conn-item:hover { opacity: .8; }
+
+  .conn-type {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+
+  .conn-label { font-size: 12px; color: var(--text); margin-bottom: 3px; }
+  .conn-target { font-size: 11px; color: var(--text-muted); }
+
+  /* ── SVG styles ── */
+  .node circle {
+    stroke-width: 2px;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+
+  .node circle:hover { stroke-width: 3px; }
+
+  .link {
+    stroke-opacity: 0.5;
+    transition: opacity .2s;
+  }
+
+  .link:hover { stroke-opacity: 1; }
+
+  .node.dimmed circle { opacity: 0.12; }
+  .link.dimmed        { opacity: 0.04; }
+
+  /* ── Loading ── */
+  #loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  /* ── Legend ── */
+  #legend {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 11px;
+    pointer-events: none;
+  }
+
+  .legend-group { margin-bottom: 10px; }
+  .legend-group:last-child { margin-bottom: 0; }
+  .legend-title { color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
+
+  .legend-row { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-line { width: 18px; height: 2px; flex-shrink: 0; border-radius: 1px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Relationship Map</h1>
+  <div class="search">
+    <input id="search" type="text" placeholder="Search comments…">
+  </div>
+  <div class="filters" id="tier-filters">
+    <span class="chip active" data-tier="foundational">Foundational</span>
+    <span class="chip active" data-tier="intermediate">Intermediate</span>
+    <span class="chip active" data-tier="advanced">Advanced</span>
+  </div>
+  <div class="filters" id="conn-filters">
+    <span class="chip active" data-conn="dependency">Dependency</span>
+    <span class="chip active" data-conn="shared_root">Shared Root</span>
+    <span class="chip active" data-conn="enabler">Enabler</span>
+    <span class="chip active" data-conn="tension">Tension</span>
+    <span class="chip active" data-conn="cross_tier_bridge">Cross-tier</span>
+  </div>
+</header>
+
+<div class="main">
+  <div id="canvas-wrap" style="position:relative;flex:1;">
+    <div id="loading">Loading data…</div>
+    <svg id="canvas"></svg>
+    <div id="legend">
+      <div class="legend-group">
+        <div class="legend-title">Tier</div>
+        <div class="legend-row"><div class="legend-dot" style="background:var(--tier-foundational)"></div>Foundational</div>
+        <div class="legend-row"><div class="legend-dot" style="background:var(--tier-intermediate)"></div>Intermediate</div>
+        <div class="legend-row"><div class="legend-dot" style="background:var(--tier-advanced)"></div>Advanced</div>
+      </div>
+      <div class="legend-group">
+        <div class="legend-title">Connection</div>
+        <div class="legend-row"><div class="legend-line" style="background:var(--conn-dependency)"></div>Dependency</div>
+        <div class="legend-row"><div class="legend-line" style="background:var(--conn-shared_root)"></div>Shared Root</div>
+        <div class="legend-row"><div class="legend-line" style="background:var(--conn-enabler)"></div>Enabler</div>
+        <div class="legend-row"><div class="legend-line" style="background:var(--conn-tension)"></div>Tension</div>
+        <div class="legend-row"><div class="legend-line" style="background:var(--conn-cross_tier_bridge)"></div>Cross-tier Bridge</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel">
+    <div class="panel-header">
+      <div class="panel-dot" id="panel-dot"></div>
+      <div class="panel-comment" id="panel-comment"></div>
+      <button class="panel-close" id="panel-close">×</button>
+    </div>
+    <div class="panel-body" id="panel-body"></div>
+  </div>
+</div>
+
+<script>
+const TIER_COLOR = {
+  foundational: "var(--tier-foundational)",
+  intermediate: "var(--tier-intermediate)",
+  advanced:     "var(--tier-advanced)",
+};
+const CONN_COLOR = {
+  dependency:        "var(--conn-dependency)",
+  shared_root:       "var(--conn-shared_root)",
+  enabler:           "var(--conn-enabler)",
+  tension:           "var(--conn-tension)",
+  cross_tier_bridge: "var(--conn-cross_tier_bridge)",
+};
+
+// ── State ──────────────────────────────────────────────────────────────────────
+let activeTiers = new Set(["foundational", "intermediate", "advanced"]);
+let activeConns = new Set(["dependency", "shared_root", "enabler", "tension", "cross_tier_bridge"]);
+let selectedId  = null;
+let searchQuery = "";
+let allData     = null;
+let simulation  = null;
+let nodeSel, linkSel;
+
+// ── Load data ──────────────────────────────────────────────────────────────────
+fetch("data/kumu_blueprint.json")
+  .then(r => r.json())
+  .then(data => {
+    allData = data;
+    document.getElementById("loading").style.display = "none";
+    init(data);
+  })
+  .catch(() => {
+    document.getElementById("loading").textContent =
+      "No data yet — run the Colab notebook first.";
+  });
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+function init(data) {
+  const wrap  = document.getElementById("canvas-wrap");
+  const svg   = d3.select("#canvas");
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+
+  svg.attr("width", W).attr("height", H);
+
+  const g = svg.append("g");
+
+  // Zoom
+  svg.call(d3.zoom()
+    .scaleExtent([0.1, 5])
+    .on("zoom", e => g.attr("transform", e.transform))
+  );
+
+  // Arrow markers per connection type
+  const defs = svg.append("defs");
+  Object.entries(CONN_COLOR).forEach(([type, color]) => {
+    defs.append("marker")
+      .attr("id", `arrow-${type}`)
+      .attr("viewBox", "0 -4 8 8")
+      .attr("refX", 18).attr("refY", 0)
+      .attr("markerWidth", 6).attr("markerHeight", 6)
+      .attr("orient", "auto")
+      .append("path")
+      .attr("d", "M0,-4L8,0L0,4")
+      .attr("fill", color.replace("var(--conn-" + type + ")", resolveColor("--conn-" + type)));
+  });
+
+  // Build nodes/links from data
+  const nodes = data.elements.map(e => ({
+    id:       e.id,
+    label:    e.label,
+    tier:     (e.attributes?.tier || e.type || "").toLowerCase(),
+    category: (e.attributes?.category || "").toLowerCase(),
+    attrs:    e.attributes || {},
+    desc:     e.description || "",
+  }));
+
+  const nodeById = Object.fromEntries(nodes.map(n => [n.id, n]));
+
+  const links = data.connections
+    .filter(c => nodeById[c.from] && nodeById[c.to])
+    .map(c => ({
+      source: c.from,
+      target: c.to,
+      type:   (c.attributes?.type || "").toLowerCase(),
+      label:  c.label || "",
+      reason: c.attributes?.reason || "",
+    }));
+
+  // Degree for sizing
+  const degree = {};
+  links.forEach(l => {
+    degree[l.source] = (degree[l.source] || 0) + 1;
+    degree[l.target] = (degree[l.target] || 0) + 1;
+  });
+  nodes.forEach(n => { n.degree = degree[n.id] || 0; });
+
+  // ── Simulation ──────────────────────────────────────────────────────────────
+  simulation = d3.forceSimulation(nodes)
+    .force("link",   d3.forceLink(links).id(d => d.id).distance(80).strength(0.4))
+    .force("charge", d3.forceManyBody().strength(-220))
+    .force("center", d3.forceCenter(W / 2, H / 2))
+    .force("collide", d3.forceCollide(d => nodeR(d) + 4));
+
+  // ── Links ───────────────────────────────────────────────────────────────────
+  linkSel = g.append("g").selectAll("line")
+    .data(links).join("line")
+    .attr("class", "link")
+    .attr("stroke", d => resolveColor("--conn-" + d.type))
+    .attr("stroke-width", 1.5)
+    .attr("marker-end", d => `url(#arrow-${d.type})`);
+
+  // ── Nodes ───────────────────────────────────────────────────────────────────
+  nodeSel = g.append("g").selectAll("g")
+    .data(nodes).join("g")
+    .attr("class", "node")
+    .call(d3.drag()
+      .on("start", (e, d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on("drag",  (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on("end",   (e, d) => { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; })
+    )
+    .on("click", (e, d) => { e.stopPropagation(); selectNode(d, nodes, links); });
+
+  nodeSel.append("circle")
+    .attr("r", d => nodeR(d))
+    .attr("fill", d => resolveColor("--tier-" + d.tier))
+    .attr("stroke", d => resolveColor("--tier-" + d.tier))
+    .attr("fill-opacity", 0.25);
+
+  simulation.on("tick", () => {
+    linkSel
+      .attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+      .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+    nodeSel.attr("transform", d => `translate(${d.x},${d.y})`);
+  });
+
+  // Deselect on canvas click
+  svg.on("click", () => deselect());
+
+  // Store for filtering
+  window._nodes = nodes;
+  window._links = links;
+
+  applyFilters();
+}
+
+function nodeR(d) {
+  return 6 + Math.sqrt(d.degree || 0) * 2.5;
+}
+
+function resolveColor(varName) {
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+}
+
+// ── Select / deselect ──────────────────────────────────────────────────────────
+function selectNode(d, nodes, links) {
+  selectedId = d.id;
+
+  const connected = new Set([d.id]);
+  links.forEach(l => {
+    const src = typeof l.source === "object" ? l.source.id : l.source;
+    const tgt = typeof l.target === "object" ? l.target.id : l.target;
+    if (src === d.id) connected.add(tgt);
+    if (tgt === d.id) connected.add(src);
+  });
+
+  nodeSel.classed("dimmed", n => !connected.has(n.id));
+  linkSel.classed("dimmed", l => {
+    const src = typeof l.source === "object" ? l.source.id : l.source;
+    const tgt = typeof l.target === "object" ? l.target.id : l.target;
+    return src !== d.id && tgt !== d.id;
+  });
+
+  // Build panel
+  const panel  = document.getElementById("panel");
+  const dot    = document.getElementById("panel-dot");
+  const comment = document.getElementById("panel-comment");
+  const body   = document.getElementById("panel-body");
+
+  dot.style.background = resolveColor("--tier-" + d.tier);
+  comment.textContent  = d.label;
+
+  const attrs = d.attrs;
+  body.innerHTML = `
+    ${row("Tier",         cap(d.tier))}
+    ${row("Category",     cap(d.category))}
+    ${attrs["core problem"] ? row("Core Problem", attrs["core problem"]) : ""}
+    ${attrs["concept"]      ? row("Concept",      attrs["concept"])      : ""}
+    ${attrs["depends on"]   ? row("Depends On",   attrs["depends on"])   : ""}
+    ${attrs["enables"]      ? row("Enables",      attrs["enables"])      : ""}
+    <div class="connections-section">
+      <div class="meta-label" style="margin-bottom:8px;">Connections</div>
+      ${buildConnList(d, links)}
+    </div>
+  `;
+
+  panel.classList.add("open");
+
+  // Click connection → jump to that node
+  body.querySelectorAll(".conn-item[data-id]").forEach(el => {
+    el.addEventListener("click", () => {
+      const target = window._nodes.find(n => n.id === el.dataset.id);
+      if (target) selectNode(target, window._nodes, window._links);
+    });
+  });
+}
+
+function buildConnList(d, links) {
+  const nodeById = Object.fromEntries(window._nodes.map(n => [n.id, n]));
+  const related  = links.filter(l => {
+    const src = typeof l.source === "object" ? l.source.id : l.source;
+    const tgt = typeof l.target === "object" ? l.target.id : l.target;
+    return src === d.id || tgt === d.id;
+  });
+
+  if (!related.length) return "<p style='color:var(--text-muted);font-size:12px;'>No connections.</p>";
+
+  return related.map(l => {
+    const src    = typeof l.source === "object" ? l.source.id : l.source;
+    const tgt    = typeof l.target === "object" ? l.target.id : l.target;
+    const otherId = src === d.id ? tgt : src;
+    const other  = nodeById[otherId];
+    const color  = resolveColor("--conn-" + l.type);
+    const dir    = src === d.id ? "→" : "←";
+    return `
+      <div class="conn-item" data-id="${otherId}" style="border-color:${color}">
+        <div class="conn-type" style="color:${color}">${l.type.replace(/_/g," ")} ${dir}</div>
+        <div class="conn-label">${l.label}</div>
+        <div class="conn-target">${other ? other.label.slice(0,70) + "…" : otherId}</div>
+        ${l.reason ? `<div class="conn-target" style="margin-top:4px;font-style:italic;">${l.reason}</div>` : ""}
+      </div>`;
+  }).join("");
+}
+
+function deselect() {
+  selectedId = null;
+  nodeSel?.classed("dimmed", false);
+  linkSel?.classed("dimmed", false);
+  document.getElementById("panel").classList.remove("open");
+}
+
+function row(label, value) {
+  return `<div class="meta-row"><div class="meta-label">${label}</div><div class="meta-value">${value}</div></div>`;
+}
+
+function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
+
+// ── Filters ────────────────────────────────────────────────────────────────────
+function applyFilters() {
+  if (!nodeSel) return;
+  const q = searchQuery.toLowerCase();
+
+  nodeSel.style("display", d => {
+    if (!activeTiers.has(d.tier)) return "none";
+    if (q && !d.label.toLowerCase().includes(q) && !d.attrs["core problem"]?.toLowerCase().includes(q)) return "none";
+    return null;
+  });
+
+  linkSel.style("display", l => {
+    if (!activeConns.has(l.type)) return "none";
+    const src = typeof l.source === "object" ? l.source : window._nodes.find(n => n.id === l.source);
+    const tgt = typeof l.target === "object" ? l.target : window._nodes.find(n => n.id === l.target);
+    if (src && !activeTiers.has(src.tier)) return "none";
+    if (tgt && !activeTiers.has(tgt.tier)) return "none";
+    return null;
+  });
+}
+
+// ── Chip filters ───────────────────────────────────────────────────────────────
+document.getElementById("tier-filters").addEventListener("click", e => {
+  const chip = e.target.closest(".chip[data-tier]");
+  if (!chip) return;
+  const t = chip.dataset.tier;
+  if (activeTiers.has(t)) activeTiers.delete(t);
+  else activeTiers.add(t);
+  chip.classList.toggle("active", activeTiers.has(t));
+  applyFilters();
+});
+
+document.getElementById("conn-filters").addEventListener("click", e => {
+  const chip = e.target.closest(".chip[data-conn]");
+  if (!chip) return;
+  const t = chip.dataset.conn;
+  if (activeConns.has(t)) activeConns.delete(t);
+  else activeConns.add(t);
+  chip.classList.toggle("active", activeConns.has(t));
+  applyFilters();
+});
+
+document.getElementById("search").addEventListener("input", e => {
+  searchQuery = e.target.value;
+  applyFilters();
+});
+
+document.getElementById("panel-close").addEventListener("click", deselect);
+
+// ── Resize ────────────────────────────────────────────────────────────────────
+window.addEventListener("resize", () => {
+  const wrap = document.getElementById("canvas-wrap");
+  d3.select("#canvas").attr("width", wrap.clientWidth).attr("height", wrap.clientHeight);
+  simulation?.force("center", d3.forceCenter(wrap.clientWidth / 2, wrap.clientHeight / 2)).alpha(0.3).restart();
+});
+</script>
+</body>
+</html>
