@@ -6,7 +6,7 @@
 <title>Signage & Wayfinding — Relationship Map</title>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <style>
-  /* ── Design tokens — change these to restyle everything ── */
+  /* ── Design tokens ── */
   :root {
     --bg:           #0f1117;
     --surface:      #1a1d27;
@@ -41,7 +41,6 @@
     flex-direction: column;
   }
 
-  /* ── Header ── */
   header {
     height: var(--header-h);
     background: var(--surface);
@@ -49,22 +48,43 @@
     display: flex;
     align-items: center;
     padding: 0 16px;
-    gap: 16px;
+    gap: 12px;
     flex-shrink: 0;
     z-index: 10;
   }
 
-  header h1 {
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: .03em;
+  header h1 { font-size: 14px; font-weight: 600; letter-spacing: .03em; white-space: nowrap; }
+
+  /* ── Layout toggle ── */
+  .view-toggle {
+    display: flex;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .view-btn {
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all .15s;
     white-space: nowrap;
+  }
+
+  .view-btn.active {
+    background: var(--accent);
+    color: #fff;
   }
 
   .search {
     flex: 1;
-    max-width: 260px;
-    position: relative;
+    max-width: 220px;
   }
 
   .search input {
@@ -80,11 +100,7 @@
 
   .search input:focus { border-color: var(--accent); }
 
-  .filters {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; }
 
   .chip {
     font-size: 11px;
@@ -109,20 +125,16 @@
   .chip[data-conn="tension"].active           { color: var(--conn-tension); }
   .chip[data-conn="cross_tier_bridge"].active { color: var(--conn-cross_tier_bridge); }
 
-  /* ── Main layout ── */
-  .main {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
-  }
+  .main { flex: 1; display: flex; overflow: hidden; }
 
-  /* ── Canvas ── */
-  #canvas {
-    flex: 1;
-    cursor: grab;
-  }
+  #canvas-wrap { position: relative; flex: 1; }
 
+  #canvas { width: 100%; height: 100%; cursor: grab; }
   #canvas:active { cursor: grabbing; }
+
+  /* ── Pyramid background (only visible in pyramid mode) ── */
+  .pyramid-bg { opacity: 0; transition: opacity .4s; pointer-events: none; }
+  .pyramid-mode .pyramid-bg { opacity: 1; }
 
   /* ── Detail panel ── */
   #panel {
@@ -145,60 +157,15 @@
     gap: 10px;
   }
 
-  .panel-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    margin-top: 3px;
-  }
-
-  .panel-comment {
-    font-size: 13px;
-    line-height: 1.5;
-    font-weight: 500;
-  }
-
-  .panel-close {
-    margin-left: auto;
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-size: 18px;
-    line-height: 1;
-    padding: 0 0 0 8px;
-    flex-shrink: 0;
-  }
+  .panel-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+  .panel-comment { font-size: 13px; line-height: 1.5; font-weight: 500; }
+  .panel-close { margin-left: auto; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 0 0 0 8px; flex-shrink: 0; }
 
   .panel-body { padding: 16px; }
 
-  .meta-row {
-    margin-bottom: 14px;
-  }
-
-  .meta-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    color: var(--text-muted);
-    margin-bottom: 4px;
-  }
-
-  .meta-value {
-    font-size: 12px;
-    line-height: 1.5;
-    color: var(--text);
-  }
-
-  .tag {
-    display: inline-block;
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 4px;
-    border: 1px solid;
-    margin: 2px 2px 0 0;
-  }
+  .meta-row { margin-bottom: 14px; }
+  .meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: 4px; }
+  .meta-value { font-size: 12px; line-height: 1.5; color: var(--text); }
 
   .connections-section { margin-top: 16px; }
 
@@ -212,38 +179,17 @@
   }
 
   .conn-item:hover { opacity: .8; }
-
-  .conn-type {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    margin-bottom: 4px;
-    font-weight: 600;
-  }
-
+  .conn-type { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; font-weight: 600; }
   .conn-label { font-size: 12px; color: var(--text); margin-bottom: 3px; }
   .conn-target { font-size: 11px; color: var(--text-muted); }
 
   /* ── SVG styles ── */
-  .node circle {
-    stroke-width: 2px;
-    cursor: pointer;
-    transition: opacity .2s;
-  }
-
+  .node circle { stroke-width: 2px; cursor: pointer; }
   .node circle:hover { stroke-width: 3px; }
+  .link { stroke-opacity: 0.5; }
+  .node.dimmed circle { opacity: 0.1; }
+  .link.dimmed { opacity: 0.03; }
 
-  .link {
-    stroke-opacity: 0.5;
-    transition: opacity .2s;
-  }
-
-  .link:hover { stroke-opacity: 1; }
-
-  .node.dimmed circle { opacity: 0.12; }
-  .link.dimmed        { opacity: 0.04; }
-
-  /* ── Loading ── */
   #loading {
     position: absolute;
     inset: 0;
@@ -255,7 +201,6 @@
     color: var(--text-muted);
   }
 
-  /* ── Legend ── */
   #legend {
     position: absolute;
     bottom: 16px;
@@ -271,7 +216,6 @@
   .legend-group { margin-bottom: 10px; }
   .legend-group:last-child { margin-bottom: 0; }
   .legend-title { color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
-
   .legend-row { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .legend-line { width: 18px; height: 2px; flex-shrink: 0; border-radius: 1px; }
@@ -281,14 +225,22 @@
 
 <header>
   <h1>Relationship Map</h1>
+
+  <div class="view-toggle">
+    <button class="view-btn active" data-view="force">Network</button>
+    <button class="view-btn"        data-view="pyramid">Pyramid</button>
+  </div>
+
   <div class="search">
     <input id="search" type="text" placeholder="Search comments…">
   </div>
+
   <div class="filters" id="tier-filters">
     <span class="chip active" data-tier="foundational">Foundational</span>
     <span class="chip active" data-tier="intermediate">Intermediate</span>
     <span class="chip active" data-tier="advanced">Advanced</span>
   </div>
+
   <div class="filters" id="conn-filters">
     <span class="chip active" data-conn="dependency">Dependency</span>
     <span class="chip active" data-conn="shared_root">Shared Root</span>
@@ -299,7 +251,7 @@
 </header>
 
 <div class="main">
-  <div id="canvas-wrap" style="position:relative;flex:1;">
+  <div id="canvas-wrap">
     <div id="loading">Loading data…</div>
     <svg id="canvas"></svg>
     <div id="legend">
@@ -331,33 +283,44 @@
 </div>
 
 <script>
+const CSS = k => getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+
 const TIER_COLOR = {
-  foundational: "var(--tier-foundational)",
-  intermediate: "var(--tier-intermediate)",
-  advanced:     "var(--tier-advanced)",
+  foundational: CSS("--tier-foundational"),
+  intermediate: CSS("--tier-intermediate"),
+  advanced:     CSS("--tier-advanced"),
 };
 const CONN_COLOR = {
-  dependency:        "var(--conn-dependency)",
-  shared_root:       "var(--conn-shared_root)",
-  enabler:           "var(--conn-enabler)",
-  tension:           "var(--conn-tension)",
-  cross_tier_bridge: "var(--conn-cross_tier_bridge)",
+  dependency:        CSS("--conn-dependency"),
+  shared_root:       CSS("--conn-shared_root"),
+  enabler:           CSS("--conn-enabler"),
+  tension:           CSS("--conn-tension"),
+  cross_tier_bridge: CSS("--conn-cross_tier_bridge"),
+};
+
+// ── Pyramid tier layout config ─────────────────────────────────────────────────
+// yFrac: vertical center of each tier (0=top, 1=bottom)
+// xSpan: fraction of total width this tier occupies (pyramid shape)
+const TIER_LAYOUT = {
+  advanced:     { yFrac: 0.18, xSpan: 0.26 },
+  intermediate: { yFrac: 0.50, xSpan: 0.58 },
+  foundational: { yFrac: 0.80, xSpan: 0.90 },
 };
 
 // ── State ──────────────────────────────────────────────────────────────────────
-let activeTiers = new Set(["foundational", "intermediate", "advanced"]);
-let activeConns = new Set(["dependency", "shared_root", "enabler", "tension", "cross_tier_bridge"]);
-let selectedId  = null;
-let searchQuery = "";
-let allData     = null;
-let simulation  = null;
-let nodeSel, linkSel;
+let currentView  = "force";
+let activeTiers  = new Set(["foundational", "intermediate", "advanced"]);
+let activeConns  = new Set(["dependency", "shared_root", "enabler", "tension", "cross_tier_bridge"]);
+let selectedId   = null;
+let searchQuery  = "";
+let simulation   = null;
+let nodeSel, linkSel, pyramidBg;
+let W, H;
 
-// ── Load data ──────────────────────────────────────────────────────────────────
+// ── Load ───────────────────────────────────────────────────────────────────────
 fetch("data/kumu_blueprint.json")
   .then(r => r.json())
   .then(data => {
-    allData = data;
     document.getElementById("loading").style.display = "none";
     init(data);
   })
@@ -368,42 +331,37 @@ fetch("data/kumu_blueprint.json")
 
 // ── Init ───────────────────────────────────────────────────────────────────────
 function init(data) {
-  const wrap  = document.getElementById("canvas-wrap");
-  const svg   = d3.select("#canvas");
-  const W = wrap.clientWidth, H = wrap.clientHeight;
-
+  const wrap = document.getElementById("canvas-wrap");
+  const svg  = d3.select("#canvas");
+  W = wrap.clientWidth;
+  H = wrap.clientHeight;
   svg.attr("width", W).attr("height", H);
 
   const g = svg.append("g");
 
-  // Zoom
-  svg.call(d3.zoom()
-    .scaleExtent([0.1, 5])
-    .on("zoom", e => g.attr("transform", e.transform))
-  );
+  svg.call(d3.zoom().scaleExtent([0.1, 5]).on("zoom", e => g.attr("transform", e.transform)));
 
-  // Arrow markers per connection type
+  // Arrow markers
   const defs = svg.append("defs");
   Object.entries(CONN_COLOR).forEach(([type, color]) => {
     defs.append("marker")
       .attr("id", `arrow-${type}`)
-      .attr("viewBox", "0 -4 8 8")
-      .attr("refX", 18).attr("refY", 0)
-      .attr("markerWidth", 6).attr("markerHeight", 6)
-      .attr("orient", "auto")
-      .append("path")
-      .attr("d", "M0,-4L8,0L0,4")
-      .attr("fill", color.replace("var(--conn-" + type + ")", resolveColor("--conn-" + type)));
+      .attr("viewBox", "0 -4 8 8").attr("refX", 18).attr("refY", 0)
+      .attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto")
+      .append("path").attr("d", "M0,-4L8,0L0,4").attr("fill", color);
   });
 
-  // Build nodes/links from data
+  // ── Pyramid background ─────────────────────────────────────────────────────
+  pyramidBg = g.append("g").attr("class", "pyramid-bg");
+  drawPyramidBg(pyramidBg);
+
+  // ── Data ───────────────────────────────────────────────────────────────────
   const nodes = data.elements.map(e => ({
     id:       e.id,
     label:    e.label,
-    tier:     (e.attributes?.tier || e.type || "").toLowerCase(),
-    category: (e.attributes?.category || "").toLowerCase(),
+    tier:     (e.attributes?.tier || e.type || "").toLowerCase().trim(),
+    category: (e.attributes?.category || "").toLowerCase().trim(),
     attrs:    e.attributes || {},
-    desc:     e.description || "",
   }));
 
   const nodeById = Object.fromEntries(nodes.map(n => [n.id, n]));
@@ -411,14 +369,12 @@ function init(data) {
   const links = data.connections
     .filter(c => nodeById[c.from] && nodeById[c.to])
     .map(c => ({
-      source: c.from,
-      target: c.to,
+      source: c.from, target: c.to,
       type:   (c.attributes?.type || "").toLowerCase(),
       label:  c.label || "",
       reason: c.attributes?.reason || "",
     }));
 
-  // Degree for sizing
   const degree = {};
   links.forEach(l => {
     degree[l.source] = (degree[l.source] || 0) + 1;
@@ -426,22 +382,22 @@ function init(data) {
   });
   nodes.forEach(n => { n.degree = degree[n.id] || 0; });
 
-  // ── Simulation ──────────────────────────────────────────────────────────────
+  // ── Simulation ─────────────────────────────────────────────────────────────
   simulation = d3.forceSimulation(nodes)
-    .force("link",   d3.forceLink(links).id(d => d.id).distance(80).strength(0.4))
-    .force("charge", d3.forceManyBody().strength(-220))
-    .force("center", d3.forceCenter(W / 2, H / 2))
+    .force("link",    d3.forceLink(links).id(d => d.id).distance(80).strength(0.4))
+    .force("charge",  d3.forceManyBody().strength(-200))
+    .force("center",  d3.forceCenter(W / 2, H / 2))
     .force("collide", d3.forceCollide(d => nodeR(d) + 4));
 
-  // ── Links ───────────────────────────────────────────────────────────────────
+  // ── Links ──────────────────────────────────────────────────────────────────
   linkSel = g.append("g").selectAll("line")
     .data(links).join("line")
     .attr("class", "link")
-    .attr("stroke", d => resolveColor("--conn-" + d.type))
+    .attr("stroke", d => CONN_COLOR[d.type] || "#888")
     .attr("stroke-width", 1.5)
     .attr("marker-end", d => `url(#arrow-${d.type})`);
 
-  // ── Nodes ───────────────────────────────────────────────────────────────────
+  // ── Nodes ──────────────────────────────────────────────────────────────────
   nodeSel = g.append("g").selectAll("g")
     .data(nodes).join("g")
     .attr("class", "node")
@@ -454,8 +410,8 @@ function init(data) {
 
   nodeSel.append("circle")
     .attr("r", d => nodeR(d))
-    .attr("fill", d => resolveColor("--tier-" + d.tier))
-    .attr("stroke", d => resolveColor("--tier-" + d.tier))
+    .attr("fill", d => TIER_COLOR[d.tier] || "#888")
+    .attr("stroke", d => TIER_COLOR[d.tier] || "#888")
     .attr("fill-opacity", 0.25);
 
   simulation.on("tick", () => {
@@ -465,23 +421,157 @@ function init(data) {
     nodeSel.attr("transform", d => `translate(${d.x},${d.y})`);
   });
 
-  // Deselect on canvas click
-  svg.on("click", () => deselect());
+  svg.on("click", deselect);
 
-  // Store for filtering
   window._nodes = nodes;
   window._links = links;
 
   applyFilters();
 }
 
-function nodeR(d) {
-  return 6 + Math.sqrt(d.degree || 0) * 2.5;
+// ── Pyramid background SVG ─────────────────────────────────────────────────────
+function drawPyramidBg(g) {
+  // Called on init and on resize — clears and redraws
+  g.selectAll("*").remove();
+
+  const PAD  = 60;  // padding from canvas edges
+  const cx   = W / 2;
+
+  // Tier y positions
+  const tierY = {
+    advanced:     H * TIER_LAYOUT.advanced.yFrac,
+    intermediate: H * TIER_LAYOUT.intermediate.yFrac,
+    foundational: H * TIER_LAYOUT.foundational.yFrac,
+  };
+
+  // Pyramid outline (triangle)
+  const apexX   = cx;
+  const apexY   = H * 0.06;
+  const baseHW  = (W * TIER_LAYOUT.foundational.xSpan) / 2;
+  const baseY   = H * 0.92;
+
+  g.append("polygon")
+    .attr("points", `${apexX},${apexY} ${cx - baseHW},${baseY} ${cx + baseHW},${baseY}`)
+    .attr("fill", "none")
+    .attr("stroke", "#ffffff0d")
+    .attr("stroke-width", 1);
+
+  // Tier band dividers and fills
+  const tiers = ["advanced", "intermediate", "foundational"];
+  const tierColors = {
+    advanced:     CSS("--tier-advanced"),
+    intermediate: CSS("--tier-intermediate"),
+    foundational: CSS("--tier-foundational"),
+  };
+
+  tiers.forEach(tier => {
+    const ly   = TIER_LAYOUT[tier];
+    const halfW = (W * ly.xSpan) / 2;
+    const y    = H * ly.yFrac;
+
+    // Horizontal band line
+    g.append("line")
+      .attr("x1", cx - halfW).attr("y1", y)
+      .attr("x2", cx + halfW).attr("y2", y)
+      .attr("stroke", tierColors[tier])
+      .attr("stroke-width", 1)
+      .attr("stroke-opacity", 0.15);
+
+    // Tier label (left side)
+    g.append("text")
+      .attr("x", cx - halfW - 8)
+      .attr("y", y + 4)
+      .attr("text-anchor", "end")
+      .attr("font-size", "11px")
+      .attr("font-family", "-apple-system, sans-serif")
+      .attr("fill", tierColors[tier])
+      .attr("fill-opacity", 0.7)
+      .text(tier.charAt(0).toUpperCase() + tier.slice(1));
+  });
+
+  // Vertical center divider (category split)
+  const topHW   = (W * TIER_LAYOUT.advanced.xSpan) / 2;
+  const botHW   = (W * TIER_LAYOUT.foundational.xSpan) / 2;
+  const topY    = H * TIER_LAYOUT.advanced.yFrac - 30;
+  const botY    = H * TIER_LAYOUT.foundational.yFrac + 30;
+
+  g.append("line")
+    .attr("x1", cx).attr("y1", topY)
+    .attr("x2", cx).attr("y2", botY)
+    .attr("stroke", "#ffffff0a")
+    .attr("stroke-width", 1)
+    .attr("stroke-dasharray", "4 4");
+
+  // Category labels at top
+  const labelY = H * TIER_LAYOUT.advanced.yFrac - 20;
+  [
+    { text: "Signage & Wayfinding", x: cx - topHW / 2 },
+    { text: "Brand Expression",     x: cx + topHW / 2 },
+  ].forEach(({ text, x }) => {
+    g.append("text")
+      .attr("x", x).attr("y", labelY)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "10px")
+      .attr("font-family", "-apple-system, sans-serif")
+      .attr("fill", "#ffffff40")
+      .attr("letter-spacing", "0.08em")
+      .text(text.toUpperCase());
+  });
 }
 
-function resolveColor(varName) {
-  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+// ── Layout switching ───────────────────────────────────────────────────────────
+function setLayout(view) {
+  currentView = view;
+  document.getElementById("canvas-wrap").classList.toggle("pyramid-mode", view === "pyramid");
+
+  if (!simulation) return;
+
+  // Release all fixed positions from dragging
+  window._nodes.forEach(n => { n.fx = null; n.fy = null; });
+
+  simulation.stop();
+  simulation.force("link",    d3.forceLink(window._links).id(d => d.id).distance(view === "pyramid" ? 60 : 80).strength(0.3));
+  simulation.force("charge",  d3.forceManyBody().strength(view === "pyramid" ? -80 : -200));
+  simulation.force("center",  null);
+  simulation.force("collide", d3.forceCollide(d => nodeR(d) + (view === "pyramid" ? 3 : 4)));
+
+  if (view === "pyramid") {
+    // Strong tier Y-positioning
+    simulation.force("tierY", d3.forceY(d => {
+      const cfg = TIER_LAYOUT[d.tier];
+      return cfg ? H * cfg.yFrac : H / 2;
+    }).strength(0.6));
+
+    // Category X-positioning within tier's horizontal span
+    simulation.force("catX", d3.forceX(d => {
+      const cfg = TIER_LAYOUT[d.tier];
+      const halfW = cfg ? (W * cfg.xSpan) / 2 : W * 0.4;
+      const cx = W / 2;
+      const isWayfinding = d.category.includes("wayfinding") || d.category.includes("signage");
+      // Left half = wayfinding, right half = brand expression
+      return isWayfinding ? cx - halfW * 0.35 : cx + halfW * 0.35;
+    }).strength(0.35));
+
+  } else {
+    simulation.force("tierY", null);
+    simulation.force("catX",  null);
+    simulation.force("center", d3.forceCenter(W / 2, H / 2));
+  }
+
+  simulation.alpha(0.8).restart();
 }
+
+// ── View toggle clicks ─────────────────────────────────────────────────────────
+document.querySelectorAll(".view-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".view-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    setLayout(btn.dataset.view);
+  });
+});
+
+// ── Node helpers ───────────────────────────────────────────────────────────────
+function nodeR(d) { return 6 + Math.sqrt(d.degree || 0) * 2.5; }
 
 // ── Select / deselect ──────────────────────────────────────────────────────────
 function selectNode(d, nodes, links) {
@@ -489,75 +579,65 @@ function selectNode(d, nodes, links) {
 
   const connected = new Set([d.id]);
   links.forEach(l => {
-    const src = typeof l.source === "object" ? l.source.id : l.source;
-    const tgt = typeof l.target === "object" ? l.target.id : l.target;
-    if (src === d.id) connected.add(tgt);
-    if (tgt === d.id) connected.add(src);
+    const s = typeof l.source === "object" ? l.source.id : l.source;
+    const t = typeof l.target === "object" ? l.target.id : l.target;
+    if (s === d.id) connected.add(t);
+    if (t === d.id) connected.add(s);
   });
 
   nodeSel.classed("dimmed", n => !connected.has(n.id));
   linkSel.classed("dimmed", l => {
-    const src = typeof l.source === "object" ? l.source.id : l.source;
-    const tgt = typeof l.target === "object" ? l.target.id : l.target;
-    return src !== d.id && tgt !== d.id;
+    const s = typeof l.source === "object" ? l.source.id : l.source;
+    const t = typeof l.target === "object" ? l.target.id : l.target;
+    return s !== d.id && t !== d.id;
   });
 
-  // Build panel
-  const panel  = document.getElementById("panel");
-  const dot    = document.getElementById("panel-dot");
-  const comment = document.getElementById("panel-comment");
-  const body   = document.getElementById("panel-body");
-
-  dot.style.background = resolveColor("--tier-" + d.tier);
-  comment.textContent  = d.label;
-
-  const attrs = d.attrs;
-  body.innerHTML = `
+  document.getElementById("panel-dot").style.background    = TIER_COLOR[d.tier] || "#888";
+  document.getElementById("panel-comment").textContent     = d.label;
+  document.getElementById("panel-body").innerHTML = `
     ${row("Tier",         cap(d.tier))}
     ${row("Category",     cap(d.category))}
-    ${attrs["core problem"] ? row("Core Problem", attrs["core problem"]) : ""}
-    ${attrs["concept"]      ? row("Concept",      attrs["concept"])      : ""}
-    ${attrs["depends on"]   ? row("Depends On",   attrs["depends on"])   : ""}
-    ${attrs["enables"]      ? row("Enables",      attrs["enables"])      : ""}
+    ${d.attrs["core problem"] ? row("Core Problem", d.attrs["core problem"]) : ""}
+    ${d.attrs["concept"]      ? row("Concept",      d.attrs["concept"])      : ""}
+    ${d.attrs["depends on"]   ? row("Depends On",   d.attrs["depends on"])   : ""}
+    ${d.attrs["enables"]      ? row("Enables",      d.attrs["enables"])      : ""}
     <div class="connections-section">
       <div class="meta-label" style="margin-bottom:8px;">Connections</div>
       ${buildConnList(d, links)}
-    </div>
-  `;
+    </div>`;
 
-  panel.classList.add("open");
+  document.getElementById("panel").classList.add("open");
 
-  // Click connection → jump to that node
-  body.querySelectorAll(".conn-item[data-id]").forEach(el => {
+  document.querySelectorAll(".conn-item[data-id]").forEach(el => {
     el.addEventListener("click", () => {
-      const target = window._nodes.find(n => n.id === el.dataset.id);
-      if (target) selectNode(target, window._nodes, window._links);
+      const t = window._nodes.find(n => n.id === el.dataset.id);
+      if (t) selectNode(t, window._nodes, window._links);
     });
   });
 }
 
 function buildConnList(d, links) {
-  const nodeById = Object.fromEntries(window._nodes.map(n => [n.id, n]));
-  const related  = links.filter(l => {
-    const src = typeof l.source === "object" ? l.source.id : l.source;
-    const tgt = typeof l.target === "object" ? l.target.id : l.target;
-    return src === d.id || tgt === d.id;
+  const byId  = Object.fromEntries(window._nodes.map(n => [n.id, n]));
+  const rel   = links.filter(l => {
+    const s = typeof l.source === "object" ? l.source.id : l.source;
+    const t = typeof l.target === "object" ? l.target.id : l.target;
+    return s === d.id || t === d.id;
   });
 
-  if (!related.length) return "<p style='color:var(--text-muted);font-size:12px;'>No connections.</p>";
+  if (!rel.length) return `<p style="color:var(--text-muted);font-size:12px;">No connections.</p>`;
 
-  return related.map(l => {
-    const src    = typeof l.source === "object" ? l.source.id : l.source;
-    const tgt    = typeof l.target === "object" ? l.target.id : l.target;
-    const otherId = src === d.id ? tgt : src;
-    const other  = nodeById[otherId];
-    const color  = resolveColor("--conn-" + l.type);
-    const dir    = src === d.id ? "→" : "←";
+  return rel.map(l => {
+    const s   = typeof l.source === "object" ? l.source.id : l.source;
+    const t   = typeof l.target === "object" ? l.target.id : l.target;
+    const oid = s === d.id ? t : s;
+    const o   = byId[oid];
+    const col = CONN_COLOR[l.type] || "#888";
+    const dir = s === d.id ? "→" : "←";
     return `
-      <div class="conn-item" data-id="${otherId}" style="border-color:${color}">
-        <div class="conn-type" style="color:${color}">${l.type.replace(/_/g," ")} ${dir}</div>
+      <div class="conn-item" data-id="${oid}" style="border-color:${col}">
+        <div class="conn-type" style="color:${col}">${l.type.replace(/_/g," ")} ${dir}</div>
         <div class="conn-label">${l.label}</div>
-        <div class="conn-target">${other ? other.label.slice(0,70) + "…" : otherId}</div>
+        <div class="conn-target">${o ? o.label.slice(0,70) + "…" : oid}</div>
         ${l.reason ? `<div class="conn-target" style="margin-top:4px;font-style:italic;">${l.reason}</div>` : ""}
       </div>`;
   }).join("");
@@ -589,21 +669,19 @@ function applyFilters() {
 
   linkSel.style("display", l => {
     if (!activeConns.has(l.type)) return "none";
-    const src = typeof l.source === "object" ? l.source : window._nodes.find(n => n.id === l.source);
-    const tgt = typeof l.target === "object" ? l.target : window._nodes.find(n => n.id === l.target);
-    if (src && !activeTiers.has(src.tier)) return "none";
-    if (tgt && !activeTiers.has(tgt.tier)) return "none";
+    const s = typeof l.source === "object" ? l.source : window._nodes.find(n => n.id === l.source);
+    const t = typeof l.target === "object" ? l.target : window._nodes.find(n => n.id === l.target);
+    if (s && !activeTiers.has(s.tier)) return "none";
+    if (t && !activeTiers.has(t.tier)) return "none";
     return null;
   });
 }
 
-// ── Chip filters ───────────────────────────────────────────────────────────────
 document.getElementById("tier-filters").addEventListener("click", e => {
   const chip = e.target.closest(".chip[data-tier]");
   if (!chip) return;
   const t = chip.dataset.tier;
-  if (activeTiers.has(t)) activeTiers.delete(t);
-  else activeTiers.add(t);
+  activeTiers[activeTiers.has(t) ? "delete" : "add"](t);
   chip.classList.toggle("active", activeTiers.has(t));
   applyFilters();
 });
@@ -612,8 +690,7 @@ document.getElementById("conn-filters").addEventListener("click", e => {
   const chip = e.target.closest(".chip[data-conn]");
   if (!chip) return;
   const t = chip.dataset.conn;
-  if (activeConns.has(t)) activeConns.delete(t);
-  else activeConns.add(t);
+  activeConns[activeConns.has(t) ? "delete" : "add"](t);
   chip.classList.toggle("active", activeConns.has(t));
   applyFilters();
 });
@@ -625,11 +702,14 @@ document.getElementById("search").addEventListener("input", e => {
 
 document.getElementById("panel-close").addEventListener("click", deselect);
 
-// ── Resize ────────────────────────────────────────────────────────────────────
 window.addEventListener("resize", () => {
   const wrap = document.getElementById("canvas-wrap");
-  d3.select("#canvas").attr("width", wrap.clientWidth).attr("height", wrap.clientHeight);
-  simulation?.force("center", d3.forceCenter(wrap.clientWidth / 2, wrap.clientHeight / 2)).alpha(0.3).restart();
+  W = wrap.clientWidth;
+  H = wrap.clientHeight;
+  d3.select("#canvas").attr("width", W).attr("height", H);
+  if (pyramidBg) drawPyramidBg(pyramidBg);
+  if (currentView === "pyramid") setLayout("pyramid");
+  else simulation?.force("center", d3.forceCenter(W / 2, H / 2)).alpha(0.3).restart();
 });
 </script>
 </body>
