@@ -28,3 +28,15 @@ let searchQuery   = "";
 let simulation    = null;
 let nodeSel, linkSel, pyramidBg;
 let W, H;
+
+// ── Live texture parameters (driven by the Styler panel) ──────────────────────
+const STYLER_DEFAULTS = {
+  grainOpacity:      0.13,
+  latticeOpacity:    0.054,
+  nodeWobbleWidth:   0.5,
+  nodeWobbleOpacity: 0.25,
+  linkWobbleWidth:   0.5,
+  linkWobbleOpacity: 0.25,
+  pyramidStipple:    1.0,
+};
+const stylerParams = { ...STYLER_DEFAULTS };

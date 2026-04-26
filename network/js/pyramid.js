@@ -26,10 +26,12 @@ function drawPyramidBg() {
   };
 
   // stipple patterns per tier — slight variance for hand-drawn feel
+  // gap is multiplied by stylerParams.pyramidStipple so the Styler can scale density
+  const sm = stylerParams.pyramidStipple;
   const stipples = {
-    advanced:     "1 3.2",
-    intermediate: "1.2 2.8",
-    foundational: "0.8 3",
+    advanced:     `1 ${(3.2 * sm).toFixed(2)}`,
+    intermediate: `1.2 ${(2.8 * sm).toFixed(2)}`,
+    foundational: `0.8 ${(3 * sm).toFixed(2)}`,
   };
 
   ["advanced", "intermediate", "foundational"].forEach((tier, i) => {
