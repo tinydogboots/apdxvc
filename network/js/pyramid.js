@@ -25,19 +25,27 @@ function drawPyramidBg() {
     foundational: CSS("--tier-foundational"),
   };
 
+  // stipple patterns per tier — slight variance for hand-drawn feel
+  const stipples = {
+    advanced:     "1 3.2",
+    intermediate: "1.2 2.8",
+    foundational: "0.8 3",
+  };
+
   ["advanced", "intermediate", "foundational"].forEach((tier, i) => {
     const ly    = TIER_LAYOUT[tier];
     const halfW = (W * ly.xSpan) / 2;
     const y     = H * ly.yFrac;
 
-    // tier band — dashed hairline
+    // tier band — stippled hairline, organic broken pattern
     pyramidBg.append("line")
       .attr("x1", cx - halfW).attr("y1", y)
       .attr("x2", cx + halfW).attr("y2", y)
       .attr("stroke", tierColors[tier])
-      .attr("stroke-width", 1)
-      .attr("stroke-opacity", 0.35)
-      .attr("stroke-dasharray", "2 4");
+      .attr("stroke-width", 0.9)
+      .attr("stroke-opacity", 0.45)
+      .attr("stroke-dasharray", stipples[tier])
+      .attr("stroke-linecap", "round");
 
     // tier label — bracket-decorated mono caps
     const code = String(i + 1).padStart(2, "0");

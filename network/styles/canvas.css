@@ -75,9 +75,7 @@
 }
 .node circle:hover { stroke-width: 2px; }
 
-.link {
-  stroke-opacity: 0.7;
-}
+/* link stroke-opacity is set per-element in graph.js for ink-bleed variance */
 
 .node.dimmed circle { opacity: 0.12; }
 .link.dimmed { opacity: 0.05; }
