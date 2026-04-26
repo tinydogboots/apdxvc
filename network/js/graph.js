@@ -69,7 +69,8 @@ function init(data) {
     .data(links).join("line")
     .attr("class", "link")
     .attr("stroke", d => CONN_COLOR[d.type] || "#1a1814")
-    .attr("stroke-width", 1)
+    .attr("stroke-width", d => 1.0 + wobble(linkSeed(d), 0.5))
+    .attr("stroke-opacity", d => 0.7 + wobble(linkSeed(d) + "o", 0.25))
     .attr("marker-end", d => `url(#arrow-${d.type})`);
 
   nodeSel = g.append("g").selectAll("g")
@@ -82,12 +83,13 @@ function init(data) {
     )
     .on("click", (e, d) => { e.stopPropagation(); selectNode(d, nodes, links); });
 
-  // hollow ink circles — paper aesthetic
+  // hollow ink circles — paper aesthetic, per-node ink variance
   nodeSel.append("circle")
     .attr("r", d => nodeR(d))
     .attr("fill", CSS("--bg"))
     .attr("stroke", d => TIER_COLOR[d.tier] || "#1a1814")
-    .attr("stroke-width", 1.2);
+    .attr("stroke-width", d => 1.1 + wobble(d.id, 0.5))
+    .attr("stroke-opacity", d => 0.85 + wobble(d.id + "o", 0.25));
 
   simulation.on("tick", () => {
     linkSel
@@ -104,3 +106,20 @@ function init(data) {
 }
 
 function nodeR(d) { return 4 + Math.sqrt(d.degree || 0) * 1.8; }
+
+// Deterministic per-element ink-bleed variance — same id always gets the same
+// stroke-width/opacity offset, so the texture is stable across re-renders but
+// looks like ink absorbing unevenly into paper.
+function inkHash(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h * 31) + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+function wobble(seed, range) {
+  return ((inkHash(seed) % 1000) / 1000 - 0.5) * range;
+}
+function linkSeed(l) {
+  const s = typeof l.source === "object" ? l.source.id : l.source;
+  const t = typeof l.target === "object" ? l.target.id : l.target;
+  return s + ">" + t;
+}
