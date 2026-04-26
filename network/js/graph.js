@@ -68,8 +68,8 @@ function init(data) {
   linkSel = g.append("g").selectAll("line")
     .data(links).join("line")
     .attr("class", "link")
-    .attr("stroke", d => CONN_COLOR[d.type] || "#888")
-    .attr("stroke-width", 1.5)
+    .attr("stroke", d => CONN_COLOR[d.type] || "#1a1814")
+    .attr("stroke-width", 1)
     .attr("marker-end", d => `url(#arrow-${d.type})`);
 
   nodeSel = g.append("g").selectAll("g")
@@ -82,11 +82,12 @@ function init(data) {
     )
     .on("click", (e, d) => { e.stopPropagation(); selectNode(d, nodes, links); });
 
+  // hollow ink circles — paper aesthetic
   nodeSel.append("circle")
     .attr("r", d => nodeR(d))
-    .attr("fill", d => TIER_COLOR[d.tier] || "#888")
-    .attr("stroke", d => TIER_COLOR[d.tier] || "#888")
-    .attr("fill-opacity", 0.25);
+    .attr("fill", CSS("--bg"))
+    .attr("stroke", d => TIER_COLOR[d.tier] || "#1a1814")
+    .attr("stroke-width", 1.2);
 
   simulation.on("tick", () => {
     linkSel
@@ -102,4 +103,4 @@ function init(data) {
   applyFilters();
 }
 
-function nodeR(d) { return 6 + Math.sqrt(d.degree || 0) * 2.5; }
+function nodeR(d) { return 4 + Math.sqrt(d.degree || 0) * 1.8; }

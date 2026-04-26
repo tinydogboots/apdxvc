@@ -3,52 +3,83 @@ function drawPyramidBg() {
   if (!pyramidBg) return;
   pyramidBg.selectAll("*").remove();
 
-  const cx = W / 2;
+  const cx     = W / 2;
   const apexY  = H * 0.06;
   const baseHW = (W * TIER_LAYOUT.foundational.xSpan) / 2;
   const baseY  = H * 0.92;
 
+  const inkFaint   = "#1a181418";
+  const inkHairline = "#1a18142a";
+  const monoStack  = '"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace';
+
+  // Pyramid outline — two ink hairlines
   pyramidBg.append("polygon")
     .attr("points", `${cx},${apexY} ${cx - baseHW},${baseY} ${cx + baseHW},${baseY}`)
-    .attr("fill", "none").attr("stroke", "#ffffff0d").attr("stroke-width", 1);
+    .attr("fill", "none")
+    .attr("stroke", inkFaint)
+    .attr("stroke-width", 1);
 
-  const tierColors = { advanced: CSS("--tier-advanced"), intermediate: CSS("--tier-intermediate"), foundational: CSS("--tier-foundational") };
+  const tierColors = {
+    advanced:     CSS("--tier-advanced"),
+    intermediate: CSS("--tier-intermediate"),
+    foundational: CSS("--tier-foundational"),
+  };
 
-  ["advanced", "intermediate", "foundational"].forEach(tier => {
-    const ly   = TIER_LAYOUT[tier];
+  ["advanced", "intermediate", "foundational"].forEach((tier, i) => {
+    const ly    = TIER_LAYOUT[tier];
     const halfW = (W * ly.xSpan) / 2;
-    const y    = H * ly.yFrac;
+    const y     = H * ly.yFrac;
 
+    // tier band — dashed hairline
     pyramidBg.append("line")
-      .attr("x1", cx - halfW).attr("y1", y).attr("x2", cx + halfW).attr("y2", y)
-      .attr("stroke", tierColors[tier]).attr("stroke-width", 1).attr("stroke-opacity", 0.2);
+      .attr("x1", cx - halfW).attr("y1", y)
+      .attr("x2", cx + halfW).attr("y2", y)
+      .attr("stroke", tierColors[tier])
+      .attr("stroke-width", 1)
+      .attr("stroke-opacity", 0.35)
+      .attr("stroke-dasharray", "2 4");
 
+    // tier label — bracket-decorated mono caps
+    const code = String(i + 1).padStart(2, "0");
     pyramidBg.append("text")
-      .attr("x", cx - halfW - 8).attr("y", y + 4)
-      .attr("text-anchor", "end").attr("font-size", "11px")
-      .attr("font-family", "-apple-system, sans-serif")
-      .attr("fill", tierColors[tier]).attr("fill-opacity", 0.7)
-      .text(tier.charAt(0).toUpperCase() + tier.slice(1));
+      .attr("x", cx - halfW - 10).attr("y", y + 3)
+      .attr("text-anchor", "end")
+      .attr("font-size", "9px")
+      .attr("font-family", monoStack)
+      .attr("font-weight", "700")
+      .attr("letter-spacing", "0.12em")
+      .attr("fill", tierColors[tier])
+      .attr("fill-opacity", 0.9)
+      .text(`[${code}] ${tier.toUpperCase()}`);
   });
 
+  // Centre axis — dotted vertical
   const topHW = (W * TIER_LAYOUT.advanced.xSpan) / 2;
-  const topY  = H * TIER_LAYOUT.advanced.yFrac - 30;
+  const topY  = H * TIER_LAYOUT.advanced.yFrac - 32;
   const botY  = H * TIER_LAYOUT.foundational.yFrac + 30;
 
   pyramidBg.append("line")
-    .attr("x1", cx).attr("y1", topY).attr("x2", cx).attr("y2", botY)
-    .attr("stroke", "#ffffff08").attr("stroke-width", 1).attr("stroke-dasharray", "4 4");
+    .attr("x1", cx).attr("y1", topY)
+    .attr("x2", cx).attr("y2", botY)
+    .attr("stroke", inkHairline)
+    .attr("stroke-width", 1)
+    .attr("stroke-dasharray", "1 4");
 
-  const labelY = H * TIER_LAYOUT.advanced.yFrac - 20;
+  // Category column labels — small mono caps
+  const labelY = H * TIER_LAYOUT.advanced.yFrac - 22;
   [
-    { text: "Signage & Wayfinding", x: cx - topHW / 2 },
-    { text: "Brand Expression",     x: cx + topHW / 2 },
+    { text: "SIGNAGE & WAYFINDING", x: cx - topHW / 2 },
+    { text: "BRAND EXPRESSION",     x: cx + topHW / 2 },
   ].forEach(({ text, x }) => {
     pyramidBg.append("text")
-      .attr("x", x).attr("y", labelY).attr("text-anchor", "middle")
-      .attr("font-size", "10px").attr("font-family", "-apple-system, sans-serif")
-      .attr("fill", "#ffffff35").attr("letter-spacing", "0.07em")
-      .text(text.toUpperCase());
+      .attr("x", x).attr("y", labelY)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "9px")
+      .attr("font-family", monoStack)
+      .attr("font-weight", "500")
+      .attr("letter-spacing", "0.18em")
+      .attr("fill", "#1a181466")
+      .text(text);
   });
 }
 

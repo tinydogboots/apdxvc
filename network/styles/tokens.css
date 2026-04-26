@@ -1,19 +1,31 @@
 :root {
-  --bg:           #0f1117;
-  --surface:      #1a1d27;
-  --surface2:     #22263a;
-  --border:       #2a2d3a;
-  --text:         #e8eaf0;
-  --text-muted:   #6b7080;
-  --accent:       #7c6af7;
+  /* paper + ink — kinari off-white, near-black sumi */
+  --bg:           #efebe1;
+  --surface:      #e6e1d4;
+  --surface2:     #d8d2c2;
+  --border:       #1a1814;
+  --text:         #1a1814;
+  --text-muted:   #7a7367;
+  --accent:       #1a1814;
 
-  --tier-foundational: #e05555;
-  --tier-intermediate: #e8922a;
-  --tier-advanced:     #3db87a;
+  /* tiers — muted earth tones, semantic hierarchy preserved */
+  --tier-foundational: #9a3a2a;  /* burnt sienna */
+  --tier-intermediate: #b87a3a;  /* warm ochre */
+  --tier-advanced:     #4a7a5a;  /* sage */
 
-  --conn-dependency:        #e05555;
-  --conn-shared_root:       #9b6fe0;
-  --conn-enabler:           #3db87a;
-  --conn-tension:           #e8922a;
-  --conn-cross_tier_bridge: #4a9eda;
+  /* connections — restrained ink with hint-of-color */
+  --conn-dependency:        #9a3a2a;
+  --conn-shared_root:       #5a4a7a;
+  --conn-enabler:           #4a7a5a;
+  --conn-tension:           #b87a3a;
+  --conn-cross_tier_bridge: #3a5a7a;
+
+  /* typographic system */
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, "Cascadia Mono", monospace;
+  --tracking:  0.04em;
+  --tracking-wide: 0.12em;
+
+  /* hairline */
+  --rule: 1px solid var(--border);
+  --rule-faint: 1px solid #1a181422;
 }

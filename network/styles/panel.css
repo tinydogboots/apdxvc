@@ -1,113 +1,193 @@
-/* ─── Detail panel — desktop (right sidebar) ─────────────────────── */
+/* ── Detail panel — desktop sidebar (paper sheet) ───────────────── */
 #panel {
-  width: 320px;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
+  width: 340px;
+  background: var(--bg);
+  border-left: var(--rule);
   overflow-y: auto;
   flex-shrink: 0;
-  transform: translateX(320px);
+  transform: translateX(340px);
   transition: transform .25s ease;
   z-index: 15;
+  font-family: var(--font-mono);
 }
 
 #panel.open { transform: translateX(0); }
 
 .panel-header {
-  padding: 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: flex-start; gap: 10px;
-  position: sticky; top: 0;
-  background: var(--surface);
+  padding: 18px 18px 14px;
+  border-bottom: var(--rule);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
   z-index: 1;
 }
 
-.panel-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
-.panel-comment { font-size: 13px; line-height: 1.5; font-weight: 500; }
-.panel-close {
-  margin-left: auto; background: none; border: none;
-  color: var(--text-muted); cursor: pointer; font-size: 20px;
-  line-height: 1; padding: 0 0 0 8px; flex-shrink: 0;
+.panel-dot {
+  width: 10px; height: 10px;
+  border: 1px solid var(--text);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.panel-comment {
+  font-size: 12px;
+  line-height: 1.55;
+  font-weight: 500;
+  letter-spacing: var(--tracking);
+  color: var(--text);
 }
 
 .panel-isolate {
   margin-left: 4px;
-  background: none;
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--text);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  padding: 4px 8px;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-.panel-body { padding: 16px; }
+.panel-isolate:hover { background: var(--text); color: var(--bg); }
 
-.meta-row { margin-bottom: 14px; }
-.meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: 4px; }
-.meta-value { font-size: 13px; line-height: 1.5; }
-
-.connections-section { margin-top: 16px; }
-
-.conn-item {
-  padding: 10px; border-radius: 6px; background: var(--bg);
-  margin-bottom: 8px; border-left: 3px solid; cursor: pointer;
+.panel-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 0 0 8px;
+  flex-shrink: 0;
 }
 
-.conn-item:hover { opacity: .8; }
-.conn-type  { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; font-weight: 600; }
-.conn-label { font-size: 12px; margin-bottom: 3px; }
-.conn-target { font-size: 11px; color: var(--text-muted); }
+.panel-close:hover { color: var(--text); }
 
-/* ─── Isolation mode ─────────────────────────────────────────────── */
+.panel-body { padding: 18px; }
+
+.meta-row {
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: var(--rule-faint);
+}
+
+.meta-row:last-of-type { border-bottom: none; }
+
+.meta-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.meta-label::before { content: "› "; }
+
+.meta-value {
+  font-size: 12px;
+  line-height: 1.55;
+  letter-spacing: var(--tracking);
+  color: var(--text);
+}
+
+.connections-section {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: var(--rule);
+}
+
+.conn-item {
+  padding: 10px 12px;
+  background: var(--surface);
+  margin-bottom: 6px;
+  border-left: 2px solid;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.conn-item:hover { background: var(--surface2); }
+
+.conn-type {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.conn-label {
+  font-size: 11px;
+  line-height: 1.45;
+  margin-bottom: 4px;
+  letter-spacing: var(--tracking);
+  color: var(--text);
+}
+
+.conn-target {
+  font-size: 10px;
+  letter-spacing: var(--tracking);
+  color: var(--text-muted);
+}
+
+/* ── Isolation bar ───────────────────────────────────────────────── */
 #isolation-bar {
   display: none;
   position: absolute;
-  top: 10px; left: 50%; transform: translateX(-50%);
-  background: var(--accent);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 7px 16px;
-  border-radius: 20px;
+  top: 16px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  padding: 8px 14px;
   z-index: 10;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   white-space: nowrap;
-  box-shadow: 0 4px 16px #0006;
 }
 
 #isolation-bar.visible { display: flex; }
 
 #isolation-bar button {
-  background: #ffffff30;
+  background: var(--bg);
   border: none;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  padding: 3px 8px;
   cursor: pointer;
 }
 
 @media (max-width: 640px) {
-  /* panel becomes bottom sheet */
   #panel {
     position: fixed;
     width: 100%;
     max-height: 60dvh;
     bottom: 0; left: 0; right: 0;
     border-left: none;
-    border-top: 1px solid var(--border);
-    border-radius: 16px 16px 0 0;
+    border-top: var(--rule);
     transform: translateY(100%);
     transition: transform .3s ease;
     z-index: 30;
   }
 
   #panel.open { transform: translateY(0); }
-
-  .panel-header { border-radius: 16px 16px 0 0; }
 }
