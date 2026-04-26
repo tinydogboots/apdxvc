@@ -69,8 +69,6 @@ function init(data) {
     .data(links).join("line")
     .attr("class", "link")
     .attr("stroke", d => CONN_COLOR[d.type] || "#1a1814")
-    .attr("stroke-width", d => 1.0 + wobble(linkSeed(d), 0.5))
-    .attr("stroke-opacity", d => 0.7 + wobble(linkSeed(d) + "o", 0.25))
     .attr("marker-end", d => `url(#arrow-${d.type})`);
 
   nodeSel = g.append("g").selectAll("g")
@@ -83,13 +81,14 @@ function init(data) {
     )
     .on("click", (e, d) => { e.stopPropagation(); selectNode(d, nodes, links); });
 
-  // hollow ink circles — paper aesthetic, per-node ink variance
+  // hollow ink circles — paper aesthetic
   nodeSel.append("circle")
     .attr("r", d => nodeR(d))
     .attr("fill", CSS("--bg"))
-    .attr("stroke", d => TIER_COLOR[d.tier] || "#1a1814")
-    .attr("stroke-width", d => 1.1 + wobble(d.id, 0.5))
-    .attr("stroke-opacity", d => 0.85 + wobble(d.id + "o", 0.25));
+    .attr("stroke", d => TIER_COLOR[d.tier] || "#1a1814");
+
+  // stroke-width / stroke-opacity variance applied here so the Styler can re-call
+  applyInkVariance();
 
   simulation.on("tick", () => {
     linkSel
@@ -122,4 +121,16 @@ function linkSeed(l) {
   const s = typeof l.source === "object" ? l.source.id : l.source;
   const t = typeof l.target === "object" ? l.target.id : l.target;
   return s + ">" + t;
+}
+
+// Re-apply the per-element variance based on current stylerParams. Called on
+// initial render and on every Styler slider change.
+function applyInkVariance() {
+  if (!nodeSel || !linkSel) return;
+  nodeSel.select("circle")
+    .attr("stroke-width",   d => 1.1 + wobble(d.id, stylerParams.nodeWobbleWidth))
+    .attr("stroke-opacity", d => 0.85 + wobble(d.id + "o", stylerParams.nodeWobbleOpacity));
+  linkSel
+    .attr("stroke-width",   d => 1.0 + wobble(linkSeed(d), stylerParams.linkWobbleWidth))
+    .attr("stroke-opacity", d => 0.7 + wobble(linkSeed(d) + "o", stylerParams.linkWobbleOpacity));
 }

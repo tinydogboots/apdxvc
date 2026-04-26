@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="network/styles/canvas.css">
 <link rel="stylesheet" href="network/styles/panel.css">
 <link rel="stylesheet" href="network/styles/drawer.css">
+<link rel="stylesheet" href="network/styles/styler.css">
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
@@ -89,6 +90,10 @@
   </div>
 </div>
 
+<!-- styler panel — designer texture controls (desktop only) -->
+<button id="styler-toggle" title="Open styler (texture controls)">[S]</button>
+<div id="styler-panel"></div>
+
 <!-- mobile filter drawer -->
 <div id="filter-drawer">
   <div class="drawer-overlay" id="drawer-overlay"></div>
@@ -119,5 +124,6 @@
 <script src="network/js/pyramid.js"></script>
 <script src="network/js/panel.js"></script>
 <script src="network/js/controls.js"></script>
+<script src="network/js/styler.js"></script>
 </body>
 </html>
