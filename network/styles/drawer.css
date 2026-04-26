@@ -1,0 +1,59 @@
+/* ─── Filter drawer (mobile) ─────────────────────────────────────── */
+#filter-drawer {
+  position: fixed; inset: 0; z-index: 40;
+  display: none;
+}
+
+#filter-drawer.open { display: block; }
+
+.drawer-overlay {
+  position: absolute; inset: 0;
+  background: #00000066;
+}
+
+.drawer-sheet {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-radius: 16px 16px 0 0;
+  padding: 20px 20px 40px;
+}
+
+.drawer-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+
+.drawer-search input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 15px;
+  padding: 10px 14px;
+  outline: none;
+  margin-bottom: 20px;
+}
+
+.drawer-search input:focus { border-color: var(--accent); }
+
+.drawer-section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.drawer-chips {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 20px;
+}
+
+.drawer-chips .chip {
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: 20px;
+}

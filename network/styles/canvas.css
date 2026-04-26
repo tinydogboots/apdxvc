@@ -1,0 +1,46 @@
+#canvas-wrap { flex: 1; position: relative; }
+#canvas { width: 100%; height: 100%; cursor: grab; display: block; }
+#canvas:active { cursor: grabbing; }
+
+/* ─── Pyramid bg ─────────────────────────────────────────────────── */
+.pyramid-bg { opacity: 0; transition: opacity .4s; pointer-events: none; }
+.pyramid-mode .pyramid-bg { opacity: 1; }
+
+/* ─── Loading ────────────────────────────────────────────────────── */
+#loading {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg); font-size: 14px; color: var(--text-muted);
+  z-index: 5;
+}
+
+/* ─── Legend ─────────────────────────────────────────────────────── */
+#legend {
+  position: absolute;
+  bottom: 16px; left: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 11px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.legend-group { margin-bottom: 10px; }
+.legend-group:last-child { margin-bottom: 0; }
+.legend-title { color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
+.legend-row { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
+.legend-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.legend-line { width: 18px; height: 2px; flex-shrink: 0; border-radius: 1px; }
+
+/* ─── Node / link SVG ────────────────────────────────────────────── */
+.node circle { stroke-width: 2px; cursor: pointer; }
+.node circle:hover { stroke-width: 3px; }
+.link { stroke-opacity: 0.5; }
+.node.dimmed circle { opacity: 0.08; }
+.link.dimmed { opacity: 0.03; }
+
+@media (max-width: 640px) {
+  #legend { display: none; }
+}
