@@ -2,44 +2,85 @@
 #canvas { width: 100%; height: 100%; cursor: grab; display: block; }
 #canvas:active { cursor: grabbing; }
 
-/* ─── Pyramid bg ─────────────────────────────────────────────────── */
+/* ── Pyramid bg ──────────────────────────────────────────────────── */
 .pyramid-bg { opacity: 0; transition: opacity .4s; pointer-events: none; }
 .pyramid-mode .pyramid-bg { opacity: 1; }
 
-/* ─── Loading ────────────────────────────────────────────────────── */
+/* ── Loading ─────────────────────────────────────────────────────── */
 #loading {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
-  background: var(--bg); font-size: 14px; color: var(--text-muted);
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-muted);
   z-index: 5;
 }
 
-/* ─── Legend ─────────────────────────────────────────────────────── */
+/* ── Legend — paper-spec block ───────────────────────────────────── */
 #legend {
   position: absolute;
-  bottom: 16px; left: 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px 14px;
-  font-size: 11px;
+  bottom: 20px; left: 20px;
+  background: var(--bg);
+  border: var(--rule);
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: var(--tracking);
+  text-transform: uppercase;
   pointer-events: none;
   z-index: 5;
+  min-width: 160px;
 }
 
 .legend-group { margin-bottom: 10px; }
 .legend-group:last-child { margin-bottom: 0; }
-.legend-title { color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
-.legend-row { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
-.legend-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.legend-line { width: 18px; height: 2px; flex-shrink: 0; border-radius: 1px; }
 
-/* ─── Node / link SVG ────────────────────────────────────────────── */
-.node circle { stroke-width: 2px; cursor: pointer; }
-.node circle:hover { stroke-width: 3px; }
-.link { stroke-opacity: 0.5; }
-.node.dimmed circle { opacity: 0.08; }
-.link.dimmed { opacity: 0.03; }
+.legend-title {
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  letter-spacing: var(--tracking-wide);
+  font-weight: 700;
+  border-bottom: var(--rule-faint);
+  padding-bottom: 4px;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid;
+}
+
+.legend-line {
+  width: 16px; height: 1px;
+  flex-shrink: 0;
+}
+
+/* ── Node / link SVG — hairline ink ──────────────────────────────── */
+.node circle {
+  stroke-width: 1px;
+  cursor: pointer;
+  transition: stroke-width .15s;
+}
+.node circle:hover { stroke-width: 2px; }
+
+.link {
+  stroke-opacity: 0.7;
+}
+
+.node.dimmed circle { opacity: 0.12; }
+.link.dimmed { opacity: 0.05; }
 
 @media (max-width: 640px) {
   #legend { display: none; }

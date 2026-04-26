@@ -1,4 +1,4 @@
-/* ─── Filter drawer (mobile) ─────────────────────────────────────── */
+/* ── Mobile filter drawer ────────────────────────────────────────── */
 #filter-drawer {
   position: fixed; inset: 0; z-index: 40;
   display: none;
@@ -8,52 +8,59 @@
 
 .drawer-overlay {
   position: absolute; inset: 0;
-  background: #00000066;
+  background: #1a181466;
 }
 
 .drawer-sheet {
   position: absolute; bottom: 0; left: 0; right: 0;
-  background: var(--surface);
-  border-radius: 16px 16px 0 0;
-  padding: 20px 20px 40px;
+  background: var(--bg);
+  border-top: var(--rule);
+  padding: 16px 20px 36px;
+  font-family: var(--font-mono);
 }
 
 .drawer-handle {
-  width: 36px; height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  margin: 0 auto 20px;
+  width: 32px; height: 2px;
+  background: var(--text);
+  margin: 0 auto 18px;
 }
 
 .drawer-search input {
   width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  background: transparent;
+  border: none;
+  border-bottom: var(--rule);
   color: var(--text);
-  font-size: 15px;
-  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: var(--tracking);
+  padding: 8px 2px;
   outline: none;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
-.drawer-search input:focus { border-color: var(--accent); }
+.drawer-search input::placeholder { color: var(--text-muted); }
+.drawer-search input:focus { border-bottom-color: var(--text); }
 
 .drawer-section-label {
-  font-size: 11px;
+  font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .08em;
+  letter-spacing: var(--tracking-wide);
   color: var(--text-muted);
   margin-bottom: 10px;
 }
 
+.drawer-section-label::before { content: "› "; }
+
 .drawer-chips {
-  display: flex; flex-wrap: wrap; gap: 8px;
-  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 22px;
 }
 
 .drawer-chips .chip {
-  font-size: 13px;
-  padding: 7px 14px;
-  border-radius: 20px;
+  font-size: 11px;
+  padding: 6px 12px;
 }

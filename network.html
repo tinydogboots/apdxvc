@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Signage & Wayfinding — Relationship Map</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="network/styles/tokens.css">
 <link rel="stylesheet" href="network/styles/base.css">
 <link rel="stylesheet" href="network/styles/header.css">
@@ -17,7 +21,7 @@
 <body>
 
 <header>
-  <h1>Relationship Map</h1>
+  <h1>FORM 01 · RELATIONSHIP MAP</h1>
 
   <div class="view-toggle">
     <button class="view-btn active" data-view="force">Network</button>
@@ -26,7 +30,7 @@
 
   <!-- desktop: search + chips inline -->
   <div class="header-controls">
-    <div class="search"><input id="search-desktop" type="text" placeholder="Search…"></div>
+    <div class="search"><input id="search-desktop" type="text" placeholder="search…"></div>
     <div class="filters" id="tier-filters-desktop">
       <span class="chip active" data-tier="foundational">Foundational</span>
       <span class="chip active" data-tier="intermediate">Intermediate</span>
@@ -34,15 +38,15 @@
     </div>
     <div class="filters" id="conn-filters-desktop">
       <span class="chip active" data-conn="dependency">Dependency</span>
-      <span class="chip active" data-conn="shared_root">Shared Root</span>
+      <span class="chip active" data-conn="shared_root">Shared</span>
       <span class="chip active" data-conn="enabler">Enabler</span>
       <span class="chip active" data-conn="tension">Tension</span>
-      <span class="chip active" data-conn="cross_tier_bridge">Cross-tier</span>
+      <span class="chip active" data-conn="cross_tier_bridge">Bridge</span>
     </div>
   </div>
 
   <!-- mobile: icon opens drawer -->
-  <button class="filter-btn" id="open-drawer" aria-label="Filters">⚙</button>
+  <button class="filter-btn" id="open-drawer" aria-label="Filters">[ + ]</button>
 </header>
 
 <div class="main">
@@ -51,15 +55,15 @@
     <svg id="canvas"></svg>
     <div id="legend">
       <div class="legend-group">
-        <div class="legend-title">Tier</div>
-        <div class="legend-row"><div class="legend-dot" style="background:var(--tier-foundational)"></div>Foundational</div>
-        <div class="legend-row"><div class="legend-dot" style="background:var(--tier-intermediate)"></div>Intermediate</div>
-        <div class="legend-row"><div class="legend-dot" style="background:var(--tier-advanced)"></div>Advanced</div>
+        <div class="legend-title">[ Tier ]</div>
+        <div class="legend-row"><div class="legend-dot" style="border-color:var(--tier-foundational);background:var(--tier-foundational)"></div>Foundational</div>
+        <div class="legend-row"><div class="legend-dot" style="border-color:var(--tier-intermediate);background:var(--tier-intermediate)"></div>Intermediate</div>
+        <div class="legend-row"><div class="legend-dot" style="border-color:var(--tier-advanced);background:var(--tier-advanced)"></div>Advanced</div>
       </div>
       <div class="legend-group">
-        <div class="legend-title">Connection</div>
+        <div class="legend-title">[ Connection ]</div>
         <div class="legend-row"><div class="legend-line" style="background:var(--conn-dependency)"></div>Dependency</div>
-        <div class="legend-row"><div class="legend-line" style="background:var(--conn-shared_root)"></div>Shared Root</div>
+        <div class="legend-row"><div class="legend-line" style="background:var(--conn-shared_root)"></div>Shared root</div>
         <div class="legend-row"><div class="legend-line" style="background:var(--conn-enabler)"></div>Enabler</div>
         <div class="legend-row"><div class="legend-line" style="background:var(--conn-tension)"></div>Tension</div>
         <div class="legend-row"><div class="legend-line" style="background:var(--conn-cross_tier_bridge)"></div>Cross-tier</div>
@@ -70,7 +74,7 @@
   <!-- isolation bar -->
   <div id="isolation-bar">
     <span id="isolation-label">Isolated view</span>
-    <button id="exit-isolation">✕ Exit</button>
+    <button id="exit-isolation">[ × ] Exit</button>
   </div>
 
   <!-- detail panel -->
@@ -79,7 +83,7 @@
       <div class="panel-dot" id="panel-dot"></div>
       <div class="panel-comment" id="panel-comment"></div>
       <button class="panel-isolate" id="panel-isolate" title="Isolate this node and its connections" style="display:none;">Isolate</button>
-      <button class="panel-close" id="panel-close">×</button>
+      <button class="panel-close" id="panel-close">[×]</button>
     </div>
     <div class="panel-body" id="panel-body"></div>
   </div>
@@ -91,7 +95,7 @@
   <div class="drawer-sheet">
     <div class="drawer-handle"></div>
     <div class="drawer-search">
-      <input id="search-mobile" type="text" placeholder="Search comments…">
+      <input id="search-mobile" type="text" placeholder="search comments…">
     </div>
     <div class="drawer-section-label">Tier</div>
     <div class="drawer-chips" id="tier-filters-mobile">
@@ -102,10 +106,10 @@
     <div class="drawer-section-label">Connection type</div>
     <div class="drawer-chips" id="conn-filters-mobile">
       <span class="chip active" data-conn="dependency">Dependency</span>
-      <span class="chip active" data-conn="shared_root">Shared Root</span>
+      <span class="chip active" data-conn="shared_root">Shared root</span>
       <span class="chip active" data-conn="enabler">Enabler</span>
       <span class="chip active" data-conn="tension">Tension</span>
-      <span class="chip active" data-conn="cross_tier_bridge">Cross-tier Bridge</span>
+      <span class="chip active" data-conn="cross_tier_bridge">Cross-tier bridge</span>
     </div>
   </div>
 </div>
