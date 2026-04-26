@@ -1,0 +1,103 @@
+header {
+  height: 52px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 10px;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+header h1 { font-size: 14px; font-weight: 600; white-space: nowrap; flex: 1; }
+
+.view-toggle {
+  display: flex;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.view-btn {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.view-btn.active { background: var(--accent); color: #fff; }
+
+/* filter icon button — desktop hidden */
+.filter-btn {
+  display: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 18px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* desktop search + chips in header */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.search input {
+  width: 180px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 6px 10px;
+  outline: none;
+}
+
+.search input:focus { border-color: var(--accent); }
+
+.filters { display: flex; gap: 6px; flex-wrap: nowrap; overflow: hidden; }
+
+.chip {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  transition: all .15s;
+}
+
+.chip.active { color: var(--text); border-color: currentColor; }
+.chip[data-tier="foundational"].active  { color: var(--tier-foundational); }
+.chip[data-tier="intermediate"].active  { color: var(--tier-intermediate); }
+.chip[data-tier="advanced"].active      { color: var(--tier-advanced); }
+.chip[data-conn="dependency"].active        { color: var(--conn-dependency); }
+.chip[data-conn="shared_root"].active       { color: var(--conn-shared_root); }
+.chip[data-conn="enabler"].active           { color: var(--conn-enabler); }
+.chip[data-conn="tension"].active           { color: var(--conn-tension); }
+.chip[data-conn="cross_tier_bridge"].active { color: var(--conn-cross_tier_bridge); }
+
+@media (max-width: 640px) {
+  .header-controls { display: none; }
+  .filter-btn { display: flex; }
+}
