@@ -32,8 +32,10 @@ function drawBgCanvas() {
     _bgCanvas = document.createElement("canvas");
     _bgCanvas.id = "bg-canvas";
     _bgCanvas.style.cssText =
-      "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;";
-    document.body.prepend(_bgCanvas);
+      "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;";
+    const terrainBg = document.getElementById("terrain-bg");
+    if (terrainBg) terrainBg.insertAdjacentElement("afterend", _bgCanvas);
+    else document.body.prepend(_bgCanvas);
   }
 
   const W = window.innerWidth, H = window.innerHeight;
@@ -44,7 +46,7 @@ function drawBgCanvas() {
   const lOpacity = stylerParams.latticeOpacity ?? 0.054;
   const patch    = stylerParams.patchiness    ?? 0.6;
 
-  ctx.fillStyle = "#1a1814";
+  ctx.fillStyle = "#efebe1";
 
   // threshold: how high the FBM field must be to place a dot.
   // low patchiness → lower threshold → broader, more even coverage
