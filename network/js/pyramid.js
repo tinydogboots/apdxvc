@@ -58,8 +58,8 @@ function drawPyramidBg() {
       .attr("font-family", monoStack)
       .attr("font-weight", "700")
       .attr("letter-spacing", "0.12em")
-      .attr("fill", tierColors[tier])
-      .attr("fill-opacity", 0.9)
+      .attr("fill", "#1a1814")
+      .attr("fill-opacity", 0.55)
       .text(`[${code}] ${tier.toUpperCase()}`);
   });
 

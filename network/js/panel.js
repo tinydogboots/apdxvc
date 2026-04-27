@@ -67,7 +67,7 @@ function buildConnList(d, links) {
     const dir = s === d.id ? "→" : "←";
     return `
       <div class="conn-item" data-id="${oid}" style="border-color:${col}">
-        <div class="conn-type" style="color:${col}">${l.type.replace(/_/g," ")} ${dir}</div>
+        <div class="conn-type" style="color:var(--text)">${l.type.replace(/_/g," ")} ${dir}</div>
         <div class="conn-label">${l.label}</div>
         <div class="conn-target">${o ? o.label.slice(0,80) : oid}</div>
         ${l.reason ? `<div class="conn-target" style="margin-top:4px;font-style:italic;">${l.reason}</div>` : ""}
