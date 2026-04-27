@@ -9,9 +9,9 @@
   --accent:       #1a1814;
 
   /* tiers — muted earth tones, semantic hierarchy preserved */
-  --tier-foundational: #9a3a2a;  /* burnt sienna */
-  --tier-intermediate: #b87a3a;  /* warm ochre */
-  --tier-advanced:     #4a7a5a;  /* sage */
+  --tier-foundational: #ede2ac;
+  --tier-intermediate: #c5ccd5;
+  --tier-advanced:     #e0e03e;
 
   /* connections — restrained ink with hint-of-color */
   --conn-dependency:        #9a3a2a;
