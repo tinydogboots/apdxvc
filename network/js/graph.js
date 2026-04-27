@@ -20,14 +20,17 @@ function init(data) {
   const g = svg.append("g");
   svg.call(d3.zoom().scaleExtent([0.08, 6]).on("zoom", e => g.attr("transform", e.transform)));
 
-  // Arrow markers
+  // Arrow markers — open chevron, greyscale
   const defs = svg.append("defs");
   Object.entries(CONN_COLOR).forEach(([type, color]) => {
     defs.append("marker")
       .attr("id", `arrow-${type}`)
       .attr("viewBox", "0 -4 8 8").attr("refX", 18).attr("refY", 0)
       .attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto")
-      .append("path").attr("d", "M0,-4L8,0L0,4").attr("fill", color);
+      .append("path").attr("d", "M0,-4L8,0L0,4")
+      .attr("fill", "none")
+      .attr("stroke", color)
+      .attr("stroke-width", 1.5);
   });
 
   pyramidBg = g.append("g").attr("class", "pyramid-bg");
@@ -81,11 +84,11 @@ function init(data) {
     )
     .on("click", (e, d) => { e.stopPropagation(); selectNode(d, nodes, links); });
 
-  // hollow ink circles — paper aesthetic
+  // solid filled circles — full tier color, no outline
   nodeSel.append("circle")
     .attr("r", d => nodeR(d))
-    .attr("fill", CSS("--bg"))
-    .attr("stroke", d => TIER_COLOR[d.tier] || "#1a1814");
+    .attr("fill", d => TIER_COLOR[d.tier] || "#1a1814")
+    .attr("stroke", "none");
 
   // stroke-width / stroke-opacity variance applied here so the Styler can re-call
   applyInkVariance();
@@ -127,9 +130,10 @@ function linkSeed(l) {
 // initial render and on every Styler slider change.
 function applyInkVariance() {
   if (!nodeSel || !linkSel) return;
+  // nodes: subtle radius + fill-opacity variance for organic ink-absorbed feel
   nodeSel.select("circle")
-    .attr("stroke-width",   d => 1.1 + wobble(d.id, stylerParams.nodeWobbleWidth))
-    .attr("stroke-opacity", d => 0.85 + wobble(d.id + "o", stylerParams.nodeWobbleOpacity));
+    .attr("r",            d => nodeR(d) + wobble(d.id, stylerParams.nodeWobbleWidth * 0.5))
+    .attr("fill-opacity", d => 0.88 + wobble(d.id + "o", stylerParams.nodeWobbleOpacity));
   linkSel
     .attr("stroke-width",   d => 1.0 + wobble(linkSeed(d), stylerParams.linkWobbleWidth))
     .attr("stroke-opacity", d => 0.7 + wobble(linkSeed(d) + "o", stylerParams.linkWobbleOpacity));

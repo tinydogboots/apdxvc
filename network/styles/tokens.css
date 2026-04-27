@@ -13,12 +13,12 @@
   --tier-intermediate: #c5ccd5;
   --tier-advanced:     #e0e03e;
 
-  /* connections — restrained ink with hint-of-color */
-  --conn-dependency:        #9a3a2a;
-  --conn-shared_root:       #5a4a7a;
-  --conn-enabler:           #4a7a5a;
-  --conn-tension:           #b87a3a;
-  --conn-cross_tier_bridge: #3a5a7a;
+  /* connections — greyscale, darker = more intense */
+  --conn-dependency:        #1e1c1a;
+  --conn-tension:           #3a3836;
+  --conn-cross_tier_bridge: #5a5856;
+  --conn-enabler:           #7a7876;
+  --conn-shared_root:       #9a9896;
 
   /* typographic system */
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, "Cascadia Mono", monospace;
