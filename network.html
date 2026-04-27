@@ -46,10 +46,16 @@
     </div>
     <div class="filters" id="conn-filters-desktop">
       <span class="chip active" data-conn="dependency">Dependency</span>
-      <span class="chip active" data-conn="shared_root">Shared</span>
-      <span class="chip active" data-conn="enabler">Enabler</span>
-      <span class="chip active" data-conn="tension">Tension</span>
-      <span class="chip active" data-conn="cross_tier_bridge">Bridge</span>
+      <span class="chip active" data-conn="synergy">Synergy</span>
+    </div>
+    <div class="filters" id="lead-filters-desktop">
+      <span class="chip active" data-lead="consultant">Consultant</span>
+      <span class="chip active" data-lead="client">Client</span>
+      <span class="chip active" data-lead="third_party">Third-party</span>
+      <span class="chip active" data-lead="tbd">TBD</span>
+    </div>
+    <div class="filters">
+      <span class="chip" id="rec-only-desktop">Rec. only</span>
     </div>
   </div>
 
@@ -71,10 +77,7 @@
       <div class="legend-group">
         <div class="legend-title">[ Connection ]</div>
         <div class="legend-row"><div class="legend-line" style="background:var(--conn-dependency)"></div>Dependency</div>
-        <div class="legend-row"><div class="legend-line" style="background:var(--conn-shared_root)"></div>Shared root</div>
-        <div class="legend-row"><div class="legend-line" style="background:var(--conn-enabler)"></div>Enabler</div>
-        <div class="legend-row"><div class="legend-line" style="background:var(--conn-tension)"></div>Tension</div>
-        <div class="legend-row"><div class="legend-line" style="background:var(--conn-cross_tier_bridge)"></div>Cross-tier</div>
+        <div class="legend-row"><div class="legend-line" style="background:var(--conn-synergy);opacity:0.7"></div>Synergy</div>
       </div>
     </div>
   </div>
@@ -107,7 +110,7 @@
   <div class="drawer-sheet">
     <div class="drawer-handle"></div>
     <div class="drawer-search">
-      <input id="search-mobile" type="text" placeholder="search comments…">
+      <input id="search-mobile" type="text" placeholder="search…">
     </div>
     <div class="drawer-section-label">Tier</div>
     <div class="drawer-chips" id="tier-filters-mobile">
@@ -118,10 +121,18 @@
     <div class="drawer-section-label">Connection type</div>
     <div class="drawer-chips" id="conn-filters-mobile">
       <span class="chip active" data-conn="dependency">Dependency</span>
-      <span class="chip active" data-conn="shared_root">Shared root</span>
-      <span class="chip active" data-conn="enabler">Enabler</span>
-      <span class="chip active" data-conn="tension">Tension</span>
-      <span class="chip active" data-conn="cross_tier_bridge">Cross-tier bridge</span>
+      <span class="chip active" data-conn="synergy">Synergy</span>
+    </div>
+    <div class="drawer-section-label">Lead</div>
+    <div class="drawer-chips" id="lead-filters-mobile">
+      <span class="chip active" data-lead="consultant">Consultant</span>
+      <span class="chip active" data-lead="client">Client</span>
+      <span class="chip active" data-lead="third_party">Third-party</span>
+      <span class="chip active" data-lead="tbd">TBD</span>
+    </div>
+    <div class="drawer-section-label">Show</div>
+    <div class="drawer-chips">
+      <span class="chip" id="rec-only-mobile">Rec. only</span>
     </div>
   </div>
 </div>

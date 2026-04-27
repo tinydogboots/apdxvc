@@ -124,11 +124,8 @@ header h1::after  { content: " ]"; color: var(--text-muted); }
 .chip[data-tier="intermediate"].active { background: var(--tier-intermediate); border-color: var(--tier-intermediate); }
 .chip[data-tier="advanced"].active     { background: var(--tier-advanced);     border-color: var(--tier-advanced); }
 
-.chip[data-conn="dependency"].active        { background: var(--conn-dependency);        border-color: var(--conn-dependency); }
-.chip[data-conn="shared_root"].active       { background: var(--conn-shared_root);       border-color: var(--conn-shared_root); }
-.chip[data-conn="enabler"].active           { background: var(--conn-enabler);           border-color: var(--conn-enabler); }
-.chip[data-conn="tension"].active           { background: var(--conn-tension);           border-color: var(--conn-tension); }
-.chip[data-conn="cross_tier_bridge"].active { background: var(--conn-cross_tier_bridge); border-color: var(--conn-cross_tier_bridge); }
+.chip[data-conn="dependency"].active { background: var(--conn-dependency); border-color: var(--conn-dependency); }
+.chip[data-conn="synergy"].active    { background: var(--conn-synergy);    border-color: var(--conn-synergy); }
 
 @media (max-width: 640px) {
   .header-controls { display: none; }

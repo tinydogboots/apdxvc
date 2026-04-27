@@ -13,12 +13,9 @@
   --tier-intermediate: #c5ccd5;
   --tier-advanced:     #e0e03e;
 
-  /* connections — greyscale, darker = more intense */
-  --conn-dependency:        #1e1c1a;
-  --conn-tension:           #3a3836;
-  --conn-cross_tier_bridge: #5a5856;
-  --conn-enabler:           #7a7876;
-  --conn-shared_root:       #9a9896;
+  /* connections — two types only */
+  --conn-dependency: #2a2826;   /* dark, directional arrow */
+  --conn-synergy:    #7a7876;   /* medium grey, dashed, no arrow */
 
   /* typographic system */
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, "Cascadia Mono", monospace;

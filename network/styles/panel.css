@@ -141,6 +141,17 @@
   color: var(--text-muted);
 }
 
+.rec-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid var(--text-muted);
+  color: var(--text-muted);
+}
+
 /* ── Isolation bar ───────────────────────────────────────────────── */
 #isolation-bar {
   display: none;
