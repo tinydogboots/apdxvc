@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Background Preview — Terrain Image</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0905; overflow: hidden; height: 100dvh; width: 100vw; }
+
+  .bg {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+  }
+
+  .overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 10;
+    pointer-events: none;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .header {
+    padding: 12px 20px;
+    color: #efebe1;
+    text-transform: uppercase;
+    border-bottom: 1px solid #efebe128;
+    background: rgba(10,9,5,0.45);
+  }
+
+  .note {
+    position: absolute;
+    bottom: 16px; left: 16px;
+    color: #efebe1;
+    opacity: 0.4;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    line-height: 1.8;
+    text-transform: uppercase;
+  }
+
+  .reg-tl { position: fixed; top: 8px; left: 8px; width: 8px; height: 8px;
+    border-top: 1px solid #efebe140; border-left: 1px solid #efebe140; }
+  .reg-br { position: fixed; bottom: 8px; right: 8px; width: 8px; height: 8px;
+    border-bottom: 1px solid #efebe140; border-right: 1px solid #efebe140; }
+</style>
+</head>
+<body>
+
+<!--
+  FILTER CHAIN (applied to your actual image):
+  1. feColorMatrix saturate=0    → strip all colour, pure grey
+  2. feColorMatrix contrast/dark → output = 1.5×input − 0.6  (pushes pale grey to dark)
+  3. feComponentTransfer discrete → 5-band hard posterize (the xerox effect)
+  4. feTurbulence grain + cloud mask → patchy photocopy grain
+  5. feComposite → blend grain into posterized image (15% grain / 85% image)
+
+  KNOBS:
+  - darken matrix: raise/lower the last number (-0.6) to brighten/darken
+  - contrast matrix: raise/lower first number (1.5) for more/less contrast
+  - discrete tableValues: fewer distinct values = more abstracted
+  - grain k2 value: raise to add more grain
+-->
+
+<svg class="bg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <filter id="terrain" x="0%" y="0%" width="100%" height="100%"
+            color-interpolation-filters="linearRGB">
+
+      <!-- 1. Desaturate: strip image colour → pure grey -->
+      <feColorMatrix type="saturate" values="0" result="grey"/>
+
+      <!-- 2. Darken + contrast: output = 1.5×input − 0.60 -->
+      <!--    pale aerial grey (~0.75) → 0.525; midtones → darker; shadows → black -->
+      <feColorMatrix in="grey" type="matrix"
+        values="1.5 0 0 0 -0.60   0 1.5 0 0 -0.60   0 0 1.5 0 -0.60   0 0 0 1 0"
+        result="dark"/>
+
+      <!-- 3. Posterize: 5 hard bands — the abstraction/xerox effect -->
+      <!--    [0–0.3]→0.0  [0.3–0.5]→0.08  [0.5–0.7]→0.28  [0.7–0.88]→0.52  [0.88–1]→0.76 -->
+      <feComponentTransfer in="dark" result="poster">
+        <feFuncR type="discrete" tableValues="0.0 0.0 0.0 0.08 0.08 0.28 0.28 0.52 0.52 0.76"/>
+        <feFuncG type="discrete" tableValues="0.0 0.0 0.0 0.08 0.08 0.28 0.28 0.52 0.52 0.76"/>
+        <feFuncB type="discrete" tableValues="0.0 0.0 0.0 0.08 0.08 0.28 0.28 0.52 0.52 0.76"/>
+      </feComponentTransfer>
+
+      <!-- 4a. Fine photocopy grain -->
+      <feTurbulence type="fractalNoise"
+        baseFrequency="0.80" numOctaves="4" seed="7" result="finegrain"/>
+
+      <!-- 4b. Cloud mask: patchy grain density -->
+      <feTurbulence type="fractalNoise"
+        baseFrequency="0.006 0.004" numOctaves="2" seed="99" result="graincloud"/>
+      <feComposite in="finegrain" in2="graincloud"
+        operator="arithmetic" k1="1.9" k2="0" k3="-0.45" k4="0.08" result="grain"/>
+
+      <!-- 5. Mix: grain subordinate to image structure -->
+      <feComposite in="grain" in2="poster"
+        operator="arithmetic" k1="0" k2="0.15" k3="0.85" k4="0"/>
+
+    </filter>
+  </defs>
+
+  <!-- Your image, scaled to fill the viewport, filter applied -->
+  <image href="data/bg_terrain.jpg"
+         x="0" y="0" width="100%" height="100%"
+         preserveAspectRatio="xMidYMid slice"
+         filter="url(#terrain)"/>
+</svg>
+
+<!-- Sample UI to judge legibility over the texture -->
+<div class="overlay">
+  <div class="header">FORM 01 · RELATIONSHIP MAP</div>
+
+  <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none">
+
+    <!-- Sample links -->
+    <line x1="50%" y1="22%" x2="50%" y2="46%" stroke="#3a3836" stroke-width="1.2" stroke-opacity="0.9"/>
+    <line x1="50%" y1="54%" x2="34%" y2="73%" stroke="#7a7876" stroke-width="1" stroke-opacity="0.8"/>
+    <line x1="50%" y1="54%" x2="66%" y2="73%" stroke="#5a5856" stroke-width="1" stroke-opacity="0.8"/>
+    <line x1="34%" y1="74%" x2="66%" y2="74%" stroke="#9a9896" stroke-width="1" stroke-opacity="0.7"/>
+
+    <!-- Advanced nodes (#e0e03e) -->
+    <circle cx="50%" cy="20%" r="11" fill="#e0e03e"/>
+    <circle cx="54%" cy="17%" r="7"  fill="#e0e03e" fill-opacity="0.9"/>
+    <circle cx="46%" cy="17%" r="6"  fill="#e0e03e" fill-opacity="0.88"/>
+
+    <!-- Intermediate (#c5ccd5) -->
+    <circle cx="50%" cy="50%" r="13" fill="#c5ccd5"/>
+    <circle cx="55%" cy="53%" r="8"  fill="#c5ccd5" fill-opacity="0.9"/>
+    <circle cx="45%" cy="47%" r="9"  fill="#c5ccd5" fill-opacity="0.88"/>
+
+    <!-- Foundational (#ede2ac) -->
+    <circle cx="34%" cy="74%" r="10" fill="#ede2ac"/>
+    <circle cx="30%" cy="78%" r="7"  fill="#ede2ac" fill-opacity="0.9"/>
+    <circle cx="38%" cy="70%" r="6"  fill="#ede2ac" fill-opacity="0.88"/>
+    <circle cx="66%" cy="74%" r="9"  fill="#ede2ac"/>
+    <circle cx="70%" cy="78%" r="6"  fill="#ede2ac" fill-opacity="0.88"/>
+
+    <!-- Labels in paper colour -->
+    <text x="15%" y="20%" font-family="monospace" font-size="8"
+          fill="#efebe1" opacity="0.7" letter-spacing="2">[01] ADVANCED</text>
+    <text x="15%" y="50%" font-family="monospace" font-size="8"
+          fill="#efebe1" opacity="0.7" letter-spacing="2">[02] INTERMEDIATE</text>
+    <text x="15%" y="75%" font-family="monospace" font-size="8"
+          fill="#efebe1" opacity="0.7" letter-spacing="2">[03] FOUNDATIONAL</text>
+  </svg>
+
+  <div class="note">
+    preview_bg.html — your image · desaturate → contrast → posterize → grain<br>
+    approve before embedding · adjust filter values to taste
+  </div>
+</div>
+
+<div class="reg-tl"></div>
+<div class="reg-br"></div>
+
+</body>
+</html>

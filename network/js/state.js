@@ -33,6 +33,7 @@ let W, H;
 const STYLER_DEFAULTS = {
   grainOpacity:      0.13,
   latticeOpacity:    0.054,
+  patchiness:        0.6,
   nodeWobbleWidth:   0.5,
   nodeWobbleOpacity: 0.25,
   linkWobbleWidth:   0.5,
