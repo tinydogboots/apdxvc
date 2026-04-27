@@ -26,20 +26,6 @@ function saveParams() {
 
 // ── Apply functions ──────────────────────────────────────────────────────────
 function applyPaperTexture() {
-  const g = stylerParams.grainOpacity;
-
-  // Fine grain masked by low-freq cloud turbulence → grain clusters where cloud is bright
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='500' height='500'>` +
-    `<filter id='n'>` +
-    `<feTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='4' seed='7' stitchTiles='stitch' result='grain'/>` +
-    `<feTurbulence type='fractalNoise' baseFrequency='0.007 0.005' numOctaves='2' seed='42' stitchTiles='stitch' result='cloud'/>` +
-    `<feComposite in='grain' in2='cloud' operator='arithmetic' k1='2' k2='0' k3='-0.5' k4='0.1' result='masked'/>` +
-    `<feColorMatrix in='masked' values='0 0 0 0 0.10  0 0 0 0 0.094  0 0 0 0 0.078  0 0 0 ${g} 0'/></filter>` +
-    `<rect width='100%25' height='100%25' filter='url(%23n)'/></svg>`;
-
-  document.body.style.backgroundImage = `url("data:image/svg+xml;utf8,${svg}")`;
-  document.body.style.backgroundSize = "500px 500px";
-
   if (typeof drawBgCanvas === "function") drawBgCanvas();
 }
 
