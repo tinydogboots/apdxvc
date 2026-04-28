@@ -59,7 +59,6 @@
   border-bottom: var(--rule-faint);
 }
 
-.list-cat-head::before { content: "› "; }
 
 .list-sub-head {
   font-family: var(--font-sans);

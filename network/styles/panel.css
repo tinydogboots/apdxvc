@@ -90,26 +90,18 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide);
-  color: var(--text-muted);
+  color: var(--text);
   margin-bottom: 6px;
 }
 
-.meta-label::before { content: "› "; }
 
 .meta-value {
-  font-family: var(--font-mono);
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: var(--tracking);
-  color: var(--text);
-}
-
-.meta-value.sentence {
   font-family: var(--font-sans);
   font-variation-settings: "wght" 300;
   font-size: 15px;
+  line-height: 1;
   letter-spacing: 0;
+  color: var(--text);
 }
 
 .connections-section {
@@ -130,26 +122,32 @@
 .conn-item:hover { background: var(--surface2); }
 
 .conn-type {
-  font-size: 15px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide);
-  margin-bottom: 4px;
-  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text);
 }
 
 .conn-label {
+  font-family: var(--font-sans);
+  font-variation-settings: "wght" 300;
   font-size: 15px;
   line-height: 1;
   margin-bottom: 4px;
-  letter-spacing: var(--tracking);
+  letter-spacing: 0;
   color: var(--text);
 }
 
 .conn-target {
+  font-family: var(--font-sans);
+  font-variation-settings: "wght" 300;
   font-size: 15px;
   line-height: 1;
-  letter-spacing: var(--tracking);
-  color: var(--text-muted);
+  letter-spacing: 0;
+  color: var(--text);
 }
 
 .rec-badge {

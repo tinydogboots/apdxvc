@@ -71,14 +71,13 @@ function buildConnList(d, links) {
     const oid = s === d.id ? t : s;
     const o   = byId[oid];
     const col = CONN_COLOR[l.type] || CONN_COLOR.dependency;
-    const dir = s === d.id ? "→" : "←";
     const pendingTag = l.status === "pending"
       ? `<span style="font-size:9px;color:var(--text-muted);margin-left:4px;">pending</span>` : "";
     const dash = l.type === "synergy"
       ? `style="border-left-style:dashed;border-color:${col}"` : `style="border-color:${col}"`;
     return `
       <div class="conn-item" data-id="${oid}" ${dash}>
-        <div class="conn-type" style="color:var(--text)">${l.type} ${dir}${pendingTag}</div>
+        <div class="conn-type" style="color:var(--text)">${l.type}${pendingTag}</div>
         ${l.label ? `<div class="conn-label">${l.label}</div>` : ""}
         <div class="conn-target">${o ? o.label.slice(0, 80) : oid}</div>
       </div>`;
