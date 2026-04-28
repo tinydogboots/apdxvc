@@ -36,7 +36,7 @@
 .panel-comment {
   font-family: var(--font-sans);
   font-variation-settings: "wght" 300;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1;
   letter-spacing: 0;
   color: var(--text);
@@ -98,7 +98,7 @@
 
 .meta-value {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 400;
   line-height: 1;
   letter-spacing: var(--tracking);
@@ -131,15 +131,16 @@
 }
 
 .conn-label {
-  font-size: 11px;
-  line-height: 1.45;
+  font-size: 9px;
+  line-height: 1;
   margin-bottom: 4px;
   letter-spacing: var(--tracking);
   color: var(--text);
 }
 
 .conn-target {
-  font-size: 10px;
+  font-size: 9px;
+  line-height: 1;
   letter-spacing: var(--tracking);
   color: var(--text-muted);
 }
