@@ -24,10 +24,12 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: var(--tracking-wide);
+  font-family: var(--font-sans);
+  font-variation-settings: "wght" 300;
+  font-size: 13px;
+  letter-spacing: 0;
   text-transform: uppercase;
+  line-height: 1;
   padding: 10px 0;
   margin-bottom: 14px;
   border-bottom: var(--rule);
@@ -45,10 +47,12 @@
 }
 
 .list-cat-head {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: var(--tracking-wide);
+  font-family: var(--font-sans);
+  font-variation-settings: "wght" 300;
+  font-size: 11px;
+  letter-spacing: 0;
   text-transform: uppercase;
+  line-height: 1;
   color: var(--text-muted);
   margin: 14px 0 8px;
   padding-bottom: 4px;
@@ -62,9 +66,9 @@
   font-variation-settings: "wght" 300;
   font-size: 13px;
   letter-spacing: 0;
+  line-height: 1;
   color: var(--text);
   margin: 14px 0 6px;
-  opacity: 0.8;
 }
 
 .list-item {
@@ -99,7 +103,7 @@
   font-family: var(--font-sans);
   font-variation-settings: "wght" 300;
   font-size: 15px;
-  line-height: 1.4;
+  line-height: 1;
   letter-spacing: 0;
   color: var(--text);
 }
@@ -163,7 +167,7 @@
   font-family: var(--font-sans);
   font-variation-settings: "wght" 300;
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 1;
   letter-spacing: 0;
   color: var(--text);
   cursor: pointer;
@@ -186,7 +190,6 @@
 
 .list-pending {
   color: var(--text-muted);
-  font-style: italic;
 }
 
 .list-no-conns {
