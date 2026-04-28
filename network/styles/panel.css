@@ -105,6 +105,13 @@
   color: var(--text);
 }
 
+.meta-value.sentence {
+  font-family: var(--font-sans);
+  font-variation-settings: "wght" 300;
+  font-size: 15px;
+  letter-spacing: 0;
+}
+
 .connections-section {
   margin-top: 18px;
   padding-top: 14px;
