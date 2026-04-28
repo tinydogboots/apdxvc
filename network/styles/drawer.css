@@ -51,7 +51,6 @@
   margin-bottom: 10px;
 }
 
-.drawer-section-label::before { content: "› "; }
 
 .drawer-chips {
   display: flex;

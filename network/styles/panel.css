@@ -94,7 +94,6 @@
   margin-bottom: 6px;
 }
 
-.meta-label::before { content: "› "; }
 
 .meta-value {
   font-family: var(--font-mono);

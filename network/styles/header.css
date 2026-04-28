@@ -20,8 +20,6 @@ header h1 {
   flex: 1;
 }
 
-header h1::before { content: "[ "; color: var(--text-muted); }
-header h1::after  { content: " ]"; color: var(--text-muted); }
 
 /* ── view toggle ─────────────────────────────────────────────────── */
 .view-toggle {
