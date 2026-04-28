@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="network/styles/panel.css">
 <link rel="stylesheet" href="network/styles/drawer.css">
 <link rel="stylesheet" href="network/styles/styler.css">
+<link rel="stylesheet" href="network/styles/listview.css">
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
@@ -32,8 +33,8 @@
   <h1>FORM 01 · RELATIONSHIP MAP</h1>
 
   <div class="view-toggle">
-    <button class="view-btn active" data-view="force">Network</button>
-    <button class="view-btn"        data-view="pyramid">Pyramid</button>
+    <button class="view-btn active" data-view="pyramid">Pyramid</button>
+    <button class="view-btn"        data-view="list">List</button>
   </div>
 
   <!-- desktop: search + chips inline -->
@@ -81,6 +82,9 @@
       </div>
     </div>
   </div>
+
+  <!-- list view (alternative to canvas) -->
+  <div id="list-wrap"></div>
 
   <!-- isolation bar -->
   <div id="isolation-bar">
@@ -143,6 +147,7 @@
 <script src="network/js/pyramid.js"></script>
 <script src="network/js/panel.js"></script>
 <script src="network/js/controls.js"></script>
+<script src="network/js/listview.js"></script>
 <script src="network/js/styler.js"></script>
 </body>
 </html>

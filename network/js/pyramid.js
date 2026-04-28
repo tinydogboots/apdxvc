@@ -96,32 +96,40 @@ function drawPyramidBg() {
 // ── Layout switching ───────────────────────────────────────────────────────────
 function setLayout(view) {
   currentView = view;
-  document.getElementById("canvas-wrap").classList.toggle("pyramid-mode", view === "pyramid");
-  if (!simulation) return;
 
+  const canvasWrap = document.getElementById("canvas-wrap");
+  const listWrap   = document.getElementById("list-wrap");
+
+  // Show/hide the two view containers
+  canvasWrap.style.display = view === "list" ? "none" : "";
+  listWrap.style.display   = view === "list" ? "block" : "none";
+  canvasWrap.classList.toggle("pyramid-mode", view === "pyramid");
+
+  if (view === "list") {
+    simulation?.stop();
+    if (typeof buildListView === "function") buildListView();
+    return;
+  }
+
+  // Pyramid view — apply tier/category forces
+  if (!simulation) return;
   window._nodes.forEach(n => { n.fx = null; n.fy = null; });
   simulation.stop();
   simulation
-    .force("link",    d3.forceLink(window._links).id(d => d.id).distance(view === "pyramid" ? 60 : 80).strength(0.3))
-    .force("charge",  d3.forceManyBody().strength(view === "pyramid" ? -80 : -200))
-    .force("center",  view === "pyramid" ? null : d3.forceCenter(W / 2, H / 2))
-    .force("collide", d3.forceCollide(d => nodeR(d) + (view === "pyramid" ? 3 : 4)));
-
-  if (view === "pyramid") {
-    simulation
-      .force("tierY", d3.forceY(d => {
-        const cfg = TIER_LAYOUT[d.tier];
-        return cfg ? H * cfg.yFrac : H / 2;
-      }).strength(0.6))
-      .force("catX", d3.forceX(d => {
-        const cfg  = TIER_LAYOUT[d.tier];
-        const halfW = cfg ? (W * cfg.xSpan) / 2 : W * 0.4;
-        const isWayfinding = d.category.includes("wayfinding") || d.category.includes("signage");
-        return isWayfinding ? W / 2 - halfW * 0.35 : W / 2 + halfW * 0.35;
-      }).strength(0.35));
-  } else {
-    simulation.force("tierY", null).force("catX", null);
-  }
+    .force("link",    d3.forceLink(window._links).id(d => d.id).distance(60).strength(0.3))
+    .force("charge",  d3.forceManyBody().strength(-80))
+    .force("center",  null)
+    .force("collide", d3.forceCollide(d => nodeR(d) + 3))
+    .force("tierY", d3.forceY(d => {
+      const cfg = TIER_LAYOUT[d.tier];
+      return cfg ? H * cfg.yFrac : H / 2;
+    }).strength(0.6))
+    .force("catX", d3.forceX(d => {
+      const cfg  = TIER_LAYOUT[d.tier];
+      const halfW = cfg ? (W * cfg.xSpan) / 2 : W * 0.4;
+      const isWayfinding = d.category.includes("wayfinding") || d.category.includes("signage");
+      return isWayfinding ? W / 2 - halfW * 0.35 : W / 2 + halfW * 0.35;
+    }).strength(0.35));
 
   simulation.alpha(0.8).restart();
 }

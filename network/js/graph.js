@@ -122,6 +122,9 @@ function init(data) {
   window._nodes = nodes;
   window._links = links;
   applyFilters();
+
+  // Pyramid is the default view — apply tier/category forces immediately
+  setLayout("pyramid");
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
