@@ -19,6 +19,7 @@
 
   /* typographic system */
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, "Cascadia Mono", monospace;
+  --font-sans: "early-sans-variable", sans-serif;
   --tracking:  0.04em;
   --tracking-wide: 0.12em;
 

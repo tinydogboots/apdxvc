@@ -79,12 +79,6 @@ document.querySelectorAll(".view-btn").forEach(btn => {
 // ── Bindings ──────────────────────────────────────────────────────────────────
 bindChips("tier-filters-desktop", "tier");
 bindChips("tier-filters-mobile",  "tier");
-bindChips("conn-filters-desktop", "conn");
-bindChips("conn-filters-mobile",  "conn");
-bindChips("lead-filters-desktop", "lead");
-bindChips("lead-filters-mobile",  "lead");
-bindToggle("rec-only-desktop", v => { showRecOnly = v; });
-bindToggle("rec-only-mobile",  v => { showRecOnly = v; });
 
 bindSearch("search-desktop");
 bindSearch("search-mobile");
