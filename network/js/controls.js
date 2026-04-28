@@ -4,7 +4,11 @@ function applyFilters() {
   const q = searchQuery.toLowerCase();
   nodeSel.style("display", d => {
     if (!activeTiers.has(d.tier)) return "none";
-    if (q && !d.label.toLowerCase().includes(q) && !d.attrs["core problem"]?.toLowerCase().includes(q)) return "none";
+    if (!activeLeads.has(d.lead)) return "none";
+    if (showRecOnly && !d.rec_only) return "none";
+    if (q && !d.label.toLowerCase().includes(q)
+           && !d.source_sentence?.toLowerCase().includes(q)
+           && !d.subheading?.toLowerCase().includes(q)) return "none";
     return null;
   });
   linkSel.style("display", l => {
@@ -17,27 +21,47 @@ function applyFilters() {
   });
 }
 
-// Sync chip state across desktop + mobile sets
+// ── Chip sync ─────────────────────────────────────────────────────────────────
 function syncChips(attr, value, active) {
   document.querySelectorAll(`.chip[${attr}="${value}"]`).forEach(c => c.classList.toggle("active", active));
 }
 
 function bindChips(containerId, type) {
-  document.getElementById(containerId).addEventListener("click", e => {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.addEventListener("click", e => {
     const chip = e.target.closest(`.chip[data-${type}]`);
     if (!chip) return;
     const val = chip.dataset[type];
-    const set = type === "tier" ? activeTiers : activeConns;
+    let set;
+    if (type === "tier") set = activeTiers;
+    else if (type === "conn") set = activeConns;
+    else if (type === "lead") set = activeLeads;
+    else return;
     set[set.has(val) ? "delete" : "add"](val);
     syncChips(`data-${type}`, val, set.has(val));
     applyFilters();
   });
 }
 
+function bindToggle(id, setter) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener("click", () => {
+    const on = el.classList.toggle("active");
+    setter(on);
+    applyFilters();
+  });
+}
+
 function bindSearch(id) {
-  document.getElementById(id).addEventListener("input", e => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener("input", e => {
     searchQuery = e.target.value;
-    document.getElementById(id === "search-desktop" ? "search-mobile" : "search-desktop").value = searchQuery;
+    const other = id === "search-desktop" ? "search-mobile" : "search-desktop";
+    const otherEl = document.getElementById(other);
+    if (otherEl) otherEl.value = searchQuery;
     applyFilters();
   });
 }
@@ -51,11 +75,15 @@ document.querySelectorAll(".view-btn").forEach(btn => {
   });
 });
 
-// ── Filter & search bindings ───────────────────────────────────────────────────
+// ── Bindings ──────────────────────────────────────────────────────────────────
 bindChips("tier-filters-desktop", "tier");
 bindChips("tier-filters-mobile",  "tier");
 bindChips("conn-filters-desktop", "conn");
 bindChips("conn-filters-mobile",  "conn");
+bindChips("lead-filters-desktop", "lead");
+bindChips("lead-filters-mobile",  "lead");
+bindToggle("rec-only-desktop", v => { showRecOnly = v; });
+bindToggle("rec-only-mobile",  v => { showRecOnly = v; });
 
 bindSearch("search-desktop");
 bindSearch("search-mobile");

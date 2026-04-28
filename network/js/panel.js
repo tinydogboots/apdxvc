@@ -16,7 +16,6 @@ function selectNode(d, nodes, links) {
     return s !== d.id && t !== d.id;
   });
 
-  // Show isolate button only if node has connections
   const hasConns = links.some(l => {
     const s = typeof l.source === "object" ? l.source.id : l.source;
     const t = typeof l.target === "object" ? l.target.id : l.target;
@@ -28,13 +27,21 @@ function selectNode(d, nodes, links) {
 
   document.getElementById("panel-dot").style.background = TIER_COLOR[d.tier] || "#888";
   document.getElementById("panel-comment").textContent  = d.label;
+
+  const leadFallback = { consultant: "Consultant", client: "Client", third_party: "Third-party", tbd: "TBD" };
+  const leadDisplay  = d.lead_label || leadFallback[d.lead] || cap(d.lead);
+  const trackVal     = (d.track || "").toLowerCase() === "single" ? "" : d.track;
+
   document.getElementById("panel-body").innerHTML = `
-    ${row("Tier",         cap(d.tier))}
-    ${row("Category",     cap(d.category))}
-    ${d.attrs["core problem"] ? row("Core Problem", d.attrs["core problem"]) : ""}
-    ${d.attrs["concept"]      ? row("Concept",      d.attrs["concept"])      : ""}
-    ${d.attrs["depends on"]   ? row("Depends On",   d.attrs["depends on"])   : ""}
-    ${d.attrs["enables"]      ? row("Enables",      d.attrs["enables"])      : ""}
+    ${d.id            ? row("Task ID",    `<span style="font-size:11px;letter-spacing:.08em;">${d.id}</span>`) : ""}
+    ${d.tier          ? row("Tier",       cap(d.tier)) : ""}
+    ${d.category      ? row("Category",   d.category) : ""}
+    ${d.lead          ? row("Lead",       leadDisplay) : ""}
+    ${trackVal        ? row("Track",      trackVal) : ""}
+    ${d.rec_only      ? row("",           `<span class="rec-badge">Recommendation only</span>`) : ""}
+    ${d.subheading    ? row("Subheading", d.subheading) : ""}
+    ${d.source_sentence ? row("Source",  `<span style="font-style:italic;">${d.source_sentence}</span>`) : ""}
+    ${d.notes         ? row("Notes",      d.notes) : ""}
     <div class="connections-section">
       <div class="meta-label" style="margin-bottom:8px;">Connections</div>
       ${buildConnList(d, links)}
@@ -63,14 +70,17 @@ function buildConnList(d, links) {
     const t   = typeof l.target === "object" ? l.target.id : l.target;
     const oid = s === d.id ? t : s;
     const o   = byId[oid];
-    const col = CONN_COLOR[l.type] || "#888";
+    const col = CONN_COLOR[l.type] || CONN_COLOR.dependency;
     const dir = s === d.id ? "→" : "←";
+    const pendingTag = l.status === "pending"
+      ? `<span style="font-size:9px;color:var(--text-muted);margin-left:4px;">pending</span>` : "";
+    const dash = l.type === "synergy"
+      ? `style="border-left-style:dashed;border-color:${col}"` : `style="border-color:${col}"`;
     return `
-      <div class="conn-item" data-id="${oid}" style="border-color:${col}">
-        <div class="conn-type" style="color:var(--text)">${l.type.replace(/_/g," ")} ${dir}</div>
-        <div class="conn-label">${l.label}</div>
-        <div class="conn-target">${o ? o.label.slice(0,80) : oid}</div>
-        ${l.reason ? `<div class="conn-target" style="margin-top:4px;font-style:italic;">${l.reason}</div>` : ""}
+      <div class="conn-item" data-id="${oid}" ${dash}>
+        <div class="conn-type" style="color:var(--text)">${l.type} ${dir}${pendingTag}</div>
+        ${l.label ? `<div class="conn-label">${l.label}</div>` : ""}
+        <div class="conn-target">${o ? o.label.slice(0, 80) : oid}</div>
       </div>`;
   }).join("");
 }
@@ -78,8 +88,6 @@ function buildConnList(d, links) {
 // ── Isolation mode ─────────────────────────────────────────────────────────────
 function enterIsolation(d) {
   isolatedId = d.id;
-
-  // Collect this node + all directly connected nodes
   const keep = new Set([d.id]);
   window._links.forEach(l => {
     const s = typeof l.source === "object" ? l.source.id : l.source;
@@ -88,7 +96,6 @@ function enterIsolation(d) {
     if (t === d.id) keep.add(s);
   });
 
-  // Hide everything outside the subgraph
   nodeSel.style("display", n => keep.has(n.id) ? null : "none");
   linkSel.style("display", l => {
     const s = typeof l.source === "object" ? l.source.id : l.source;
@@ -96,32 +103,25 @@ function enterIsolation(d) {
     return keep.has(s) && keep.has(t) ? null : "none";
   });
 
-  // Un-dim everything that's visible
   nodeSel.classed("dimmed", false);
   linkSel.classed("dimmed", false);
-
-  // Re-centre the isolated subgraph
   window._nodes.forEach(n => { n.fx = null; n.fy = null; });
   simulation?.force("center", d3.forceCenter(W / 2, H / 2)).alpha(0.6).restart();
 
-  // Show isolation bar
-  const bar = document.getElementById("isolation-bar");
   document.getElementById("isolation-label").textContent = `${keep.size} nodes isolated`;
-  bar.classList.add("visible");
-
-  // Close panel
+  document.getElementById("isolation-bar").classList.add("visible");
   document.getElementById("panel").classList.remove("open");
 }
 
 function exitIsolation() {
   isolatedId = null;
   document.getElementById("isolation-bar").classList.remove("visible");
-  applyFilters();           // restore normal visibility
+  applyFilters();
   simulation?.alpha(0.4).restart();
 }
 
 function deselect() {
-  if (isolatedId) return;   // don't deselect while isolated — use Exit button
+  if (isolatedId) return;
   selectedId = null;
   nodeSel?.classed("dimmed", false);
   linkSel?.classed("dimmed", false);
@@ -129,7 +129,9 @@ function deselect() {
 }
 
 function row(label, value) {
-  return `<div class="meta-row"><div class="meta-label">${label}</div><div class="meta-value">${value}</div></div>`;
+  const labelHtml = label
+    ? `<div class="meta-label">${label}</div>` : "";
+  return `<div class="meta-row">${labelHtml}<div class="meta-value">${value}</div></div>`;
 }
 
 function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
