@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://use.typekit.net/xfu3eep.css">
 
 <link rel="stylesheet" href="network/styles/tokens.css">
 <link rel="stylesheet" href="network/styles/base.css">
@@ -45,19 +46,6 @@
       <span class="chip active" data-tier="intermediate">Intermediate</span>
       <span class="chip active" data-tier="advanced">Advanced</span>
     </div>
-    <div class="filters" id="conn-filters-desktop">
-      <span class="chip active" data-conn="dependency">Dependency</span>
-      <span class="chip active" data-conn="synergy">Synergy</span>
-    </div>
-    <div class="filters" id="lead-filters-desktop">
-      <span class="chip active" data-lead="consultant">Consultant</span>
-      <span class="chip active" data-lead="client">Client</span>
-      <span class="chip active" data-lead="third_party">Third-party</span>
-      <span class="chip active" data-lead="tbd">TBD</span>
-    </div>
-    <div class="filters">
-      <span class="chip" id="rec-only-desktop">Rec. only</span>
-    </div>
   </div>
 
   <!-- mobile: icon opens drawer -->
@@ -68,19 +56,6 @@
   <div id="canvas-wrap">
     <div id="loading">Loading data…</div>
     <svg id="canvas"></svg>
-    <div id="legend">
-      <div class="legend-group">
-        <div class="legend-title">[ Tier ]</div>
-        <div class="legend-row"><div class="legend-dot" style="background:var(--tier-foundational);border:none"></div>Foundational</div>
-        <div class="legend-row"><div class="legend-dot" style="background:var(--tier-intermediate);border:none"></div>Intermediate</div>
-        <div class="legend-row"><div class="legend-dot" style="background:var(--tier-advanced);border:none"></div>Advanced</div>
-      </div>
-      <div class="legend-group">
-        <div class="legend-title">[ Connection ]</div>
-        <div class="legend-row"><div class="legend-line" style="background:var(--conn-dependency)"></div>Dependency</div>
-        <div class="legend-row"><div class="legend-line" style="background:var(--conn-synergy);opacity:0.7"></div>Synergy</div>
-      </div>
-    </div>
   </div>
 
   <!-- list view (alternative to canvas) -->
@@ -121,22 +96,6 @@
       <span class="chip active" data-tier="foundational">Foundational</span>
       <span class="chip active" data-tier="intermediate">Intermediate</span>
       <span class="chip active" data-tier="advanced">Advanced</span>
-    </div>
-    <div class="drawer-section-label">Connection type</div>
-    <div class="drawer-chips" id="conn-filters-mobile">
-      <span class="chip active" data-conn="dependency">Dependency</span>
-      <span class="chip active" data-conn="synergy">Synergy</span>
-    </div>
-    <div class="drawer-section-label">Lead</div>
-    <div class="drawer-chips" id="lead-filters-mobile">
-      <span class="chip active" data-lead="consultant">Consultant</span>
-      <span class="chip active" data-lead="client">Client</span>
-      <span class="chip active" data-lead="third_party">Third-party</span>
-      <span class="chip active" data-lead="tbd">TBD</span>
-    </div>
-    <div class="drawer-section-label">Show</div>
-    <div class="drawer-chips">
-      <span class="chip" id="rec-only-mobile">Rec. only</span>
     </div>
   </div>
 </div>

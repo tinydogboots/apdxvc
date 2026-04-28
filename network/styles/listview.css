@@ -25,7 +25,7 @@
   align-items: center;
   gap: 10px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   padding: 10px 0;
@@ -58,9 +58,10 @@
 .list-cat-head::before { content: "› "; }
 
 .list-sub-head {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: var(--tracking);
+  font-family: var(--font-sans);
+  font-variation-settings: "wght" 300;
+  font-size: 13px;
+  letter-spacing: 0;
   color: var(--text);
   margin: 14px 0 6px;
   opacity: 0.8;
@@ -95,14 +96,16 @@
 
 .list-src {
   flex: 1;
-  font-size: 12px;
-  line-height: 1.5;
-  letter-spacing: var(--tracking);
+  font-family: var(--font-sans);
+  font-variation-settings: "wght" 300;
+  font-size: 15px;
+  line-height: 1.4;
+  letter-spacing: 0;
   color: var(--text);
 }
 
 .list-item.expanded .list-src {
-  font-weight: 700;
+  font-variation-settings: "wght" 500;
 }
 
 .list-meta {
@@ -157,8 +160,11 @@
 
 .list-conn-block li > span[data-jump] {
   flex: 1;
-  font-size: 11px;
-  line-height: 1.5;
+  font-family: var(--font-sans);
+  font-variation-settings: "wght" 300;
+  font-size: 14px;
+  line-height: 1.4;
+  letter-spacing: 0;
   color: var(--text);
   cursor: pointer;
   transition: color .12s;

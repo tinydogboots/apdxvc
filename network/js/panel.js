@@ -33,7 +33,7 @@ function selectNode(d, nodes, links) {
   const trackVal     = (d.track || "").toLowerCase() === "single" ? "" : d.track;
 
   document.getElementById("panel-body").innerHTML = `
-    ${d.id            ? row("Task ID",    `<span style="font-size:11px;letter-spacing:.08em;">${d.id}</span>`) : ""}
+    ${d.id            ? row("Task ID",    `<span style="font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;">${d.id}</span>`) : ""}
     ${d.tier          ? row("Tier",       cap(d.tier)) : ""}
     ${d.category      ? row("Category",   d.category) : ""}
     ${d.lead          ? row("Lead",       leadDisplay) : ""}

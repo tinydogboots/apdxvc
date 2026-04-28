@@ -34,10 +34,11 @@
 }
 
 .panel-comment {
-  font-size: 12px;
-  line-height: 1.55;
-  font-weight: 500;
-  letter-spacing: var(--tracking);
+  font-family: var(--font-sans);
+  font-variation-settings: "wght" 300;
+  font-size: 14px;
+  line-height: 1.4;
+  letter-spacing: 0;
   color: var(--text);
 }
 
@@ -96,9 +97,11 @@
 .meta-label::before { content: "› "; }
 
 .meta-value {
-  font-size: 12px;
-  line-height: 1.55;
-  letter-spacing: var(--tracking);
+  font-family: var(--font-sans);
+  font-variation-settings: "wght" 300;
+  font-size: 14px;
+  line-height: 1.4;
+  letter-spacing: 0;
   color: var(--text);
 }
 
