@@ -42,6 +42,7 @@ function init(data) {
     subheading:      e.attributes?.subheading || "",
     source_sentence: e.attributes?.source_sentence || "",
     lead:            (e.attributes?.lead || "tbd").toLowerCase().replace(/[- ]/g, "_"),
+    lead_label:      e.attributes?.lead_label || "",
     track:           e.attributes?.track || "",
     rec_only:        !!(e.attributes?.recommendation_only),
     notes:           e.attributes?.notes || "",
@@ -68,12 +69,12 @@ function init(data) {
   });
   nodes.forEach(n => { n.degree = degree[n.id] || 0; });
 
-  // Track groups — used by the clustering force
+  // Track groups — only real parallel tracks; "Single" / "" = no clustering
   const trackGroups = {};
   nodes.forEach(n => {
-    if (n.track) {
-      (trackGroups[n.track] = trackGroups[n.track] || []).push(n);
-    }
+    const t = (n.track || "").trim().toLowerCase();
+    if (!t || t === "single") return;
+    (trackGroups[n.track] = trackGroups[n.track] || []).push(n);
   });
 
   simulation = d3.forceSimulation(nodes)

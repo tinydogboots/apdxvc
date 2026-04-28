@@ -28,14 +28,16 @@ function selectNode(d, nodes, links) {
   document.getElementById("panel-dot").style.background = TIER_COLOR[d.tier] || "#888";
   document.getElementById("panel-comment").textContent  = d.label;
 
-  const leadLabel = { consultant: "Consultant", client: "Client", third_party: "Third-party", tbd: "TBD" };
+  const leadFallback = { consultant: "Consultant", client: "Client", third_party: "Third-party", tbd: "TBD" };
+  const leadDisplay  = d.lead_label || leadFallback[d.lead] || cap(d.lead);
+  const trackVal     = (d.track || "").toLowerCase() === "single" ? "" : d.track;
 
   document.getElementById("panel-body").innerHTML = `
     ${d.id            ? row("Task ID",    `<span style="font-size:11px;letter-spacing:.08em;">${d.id}</span>`) : ""}
     ${d.tier          ? row("Tier",       cap(d.tier)) : ""}
-    ${d.category      ? row("Category",   cap(d.category)) : ""}
-    ${d.lead          ? row("Lead",       leadLabel[d.lead] || cap(d.lead)) : ""}
-    ${d.track         ? row("Track",      d.track) : ""}
+    ${d.category      ? row("Category",   d.category) : ""}
+    ${d.lead          ? row("Lead",       leadDisplay) : ""}
+    ${trackVal        ? row("Track",      trackVal) : ""}
     ${d.rec_only      ? row("",           `<span class="rec-badge">Recommendation only</span>`) : ""}
     ${d.subheading    ? row("Subheading", d.subheading) : ""}
     ${d.source_sentence ? row("Source",  `<span style="font-style:italic;">${d.source_sentence}</span>`) : ""}
