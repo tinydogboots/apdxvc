@@ -40,7 +40,7 @@ function selectNode(d, nodes, links) {
     ${trackVal        ? row("Track",      trackVal) : ""}
     ${d.rec_only      ? row("",           `<span class="rec-badge">Recommendation only</span>`) : ""}
     ${d.subheading    ? row("Subheading", d.subheading) : ""}
-    ${d.source_sentence ? row("Source",  d.source_sentence) : ""}
+    ${d.source_sentence ? `<div class="meta-row"><div class="meta-label">Source</div><div class="meta-value sentence">${d.source_sentence}</div></div>` : ""}
     ${d.notes         ? row("Notes",      d.notes) : ""}
     <div class="connections-section">
       <div class="meta-label" style="margin-bottom:8px;">Connections</div>
