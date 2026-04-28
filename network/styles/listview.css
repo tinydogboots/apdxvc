@@ -162,7 +162,8 @@
   border-bottom: none;
 }
 
-.list-conn-block li > span[data-jump] {
+.list-conn-block li > span[data-jump],
+.list-task-label {
   flex: 1;
   font-family: var(--font-sans);
   font-variation-settings: "wght" 300;
@@ -174,7 +175,8 @@
   transition: color .12s;
 }
 
-.list-conn-block li > span[data-jump]:hover {
+.list-conn-block li > span[data-jump]:hover,
+.list-task-label:hover {
   color: var(--text);
   text-decoration: underline;
 }

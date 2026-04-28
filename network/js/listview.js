@@ -143,7 +143,7 @@ function _toggleExpansion(item) {
   );
 
   const conns = _connectionsFor(tasks);
-  exp.innerHTML = _renderExpansion(conns);
+  exp.innerHTML = _renderExpansion(conns, tasks);
   item.classList.add("expanded");
   _expanded.add(key);
 
@@ -155,10 +155,35 @@ function _toggleExpansion(item) {
       _jumpTo(target);
     });
   });
+
+  // Wire task-clicks: clicking a task label opens the detail panel
+  exp.querySelectorAll("[data-task-id]").forEach(el => {
+    el.addEventListener("click", e => {
+      e.stopPropagation();
+      const node = window._nodes.find(n => n.id === el.dataset.taskId);
+      if (node && typeof selectNode === "function") {
+        selectNode(node, window._nodes, window._links);
+      }
+    });
+  });
 }
 
-function _renderExpansion(conns) {
+function _renderExpansion(conns, tasks) {
   const parts = [];
+
+  if (tasks && tasks.length) {
+    const items = tasks.map(t => {
+      const leadDisp  = t.lead_label || t.lead || "";
+      const trackDisp = (t.track || "").toLowerCase() === "single" ? "" : t.track;
+      const metaBits  = [t.id, leadDisp, trackDisp, t.rec_only ? "rec-only" : ""].filter(Boolean);
+      return `<li>
+        <span class="list-task-label" data-task-id="${t.id}">${t.label}</span>
+        <span class="list-conn-count">${metaBits.join(" · ")}</span>
+      </li>`;
+    }).join("");
+    parts.push(`<div class="list-conn-block"><div class="list-conn-label">Tasks</div><ul>${items}</ul></div>`);
+  }
+
   const block = (label, entries) => {
     if (!entries.length) return "";
     const items = entries.map(([sentence, meta]) => {
@@ -170,7 +195,7 @@ function _renderExpansion(conns) {
   parts.push(block("Depends on", conns.depends_on));
   parts.push(block("Enables",    conns.enables));
   parts.push(block("Synergy",    conns.synergy));
-  if (parts.every(p => !p)) return `<p class="list-no-conns">No cross-sentence connections.</p>`;
+  if (parts.every(p => !p)) return `<p class="list-no-conns">No tasks or connections.</p>`;
   return parts.join("");
 }
 
