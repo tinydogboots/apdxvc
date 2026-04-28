@@ -16,7 +16,7 @@ const TIER_LAYOUT = {
   foundational: { yFrac: 0.80, xSpan: 0.90 },
 };
 
-let currentView   = "force";
+let currentView   = "pyramid";
 let activeTiers   = new Set(["foundational", "intermediate", "advanced"]);
 let activeConns   = new Set(["dependency", "synergy"]);
 let activeLeads   = new Set(["consultant", "client", "third_party", "tbd"]);

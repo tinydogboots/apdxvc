@@ -1,5 +1,6 @@
 // ── Filters ────────────────────────────────────────────────────────────────────
 function applyFilters() {
+  if (typeof applyListFilters === "function") applyListFilters();
   if (!nodeSel) return;
   const q = searchQuery.toLowerCase();
   nodeSel.style("display", d => {
